@@ -11,21 +11,25 @@ import com.grinderwolf.swm.api.world.properties.SlimePropertyMap;
 import com.grinderwolf.swm.nms.CraftSlimeWorld;
 import com.grinderwolf.swm.nms.SlimeNMS;
 import com.grinderwolf.swm.nms.v1_8_R3.v1_8_R3SlimeNMS;
+import com.grinderwolf.swm.plugin.command.CommandLoader;
+import com.grinderwolf.swm.plugin.command.SWMCommand;
 import com.grinderwolf.swm.plugin.commands.CommandManager;
 import com.grinderwolf.swm.plugin.config.*;
 import com.grinderwolf.swm.plugin.loaders.LoaderUtils;
 import com.grinderwolf.swm.plugin.log.Logging;
-import com.grinderwolf.swm.plugin.update.Updater;
 import com.grinderwolf.swm.plugin.upgrade.WorldUpgrader;
 import com.grinderwolf.swm.plugin.world.WorldUnlocker;
 import com.grinderwolf.swm.plugin.world.importer.WorldImporter;
 import lombok.Getter;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bukkit.*;
+import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.reflections.Reflections;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,6 +40,9 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
     private static SWMPlugin instance;
     @Getter
     private SlimeNMS nms;
+    @Getter
+    public CommandMap commandMap;
+    private CommandLoader cl;
 
     private final List<SlimeWorld> worlds = new ArrayList<>();
     private final ExecutorService worldGeneratorService = Executors.newFixedThreadPool(1);
@@ -43,8 +50,15 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
 
     @Override
     public void onLoad() {
+        /*
+            Static abuse?!?! Nah I'm meming, we all know this is the easiest way to do it
+            Credit: @swofty
+         */
         instance = this;
 
+        /*
+            Initialize config files
+         */
         try {
             ConfigManager.initialize();
         } catch (NullPointerException | IOException | ObjectMappingException ex) {
@@ -52,9 +66,11 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
             ex.printStackTrace();
             return;
         }
-
         LoaderUtils.registerLoaders();
 
+        /*
+            Initialize NMS bridge
+         */
         try {
             nms = getNMSBridge();
         } catch (InvalidVersionException ex) {
@@ -62,9 +78,33 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
             return;
         }
 
-        List<String> erroredWorlds = loadWorlds();
+        /*
+            Initialize commands
+         */
+        try {
+            Field f = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+            f.setAccessible(true);
+            commandMap = (CommandMap) f.get(Bukkit.getServer());
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+        cl = new CommandLoader();
+        SWMCommand.register();
 
-        // Default world override
+        Reflections reflection = new Reflections("com.grinderwolf.swm.plugin.command.subtypes");
+        for(Class<? extends SWMCommand> l:reflection.getSubTypesOf(SWMCommand.class)) {
+            try {
+                SWMCommand command = l.newInstance();
+                cl.register(command);
+            } catch (InstantiationException | IllegalAccessException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        /*
+            Load worlds
+         */
+        List<String> erroredWorlds = loadWorlds();
         try {
             Properties props = new Properties();
 
@@ -102,19 +142,15 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
 
         final CommandManager commandManager = new CommandManager();
         final PluginCommand swmCommand = getCommand("swm");
-        swmCommand.setExecutor(commandManager);
+        // swmCommand.setExecutor(commandManager);
 
         try {
-            swmCommand.setTabCompleter(commandManager);
+            // swmCommand.setTabCompleter(commandManager);
         } catch (Throwable throwable) {
             // For some versions that does not have TabComplete?
         }
 
         getServer().getPluginManager().registerEvents(new WorldUnlocker(), this);
-
-        if (ConfigManager.getMainConfig().getUpdaterOptions().isEnabled()) {
-            getServer().getPluginManager().registerEvents(new Updater(), this);
-        }
 
         if (ConfigManager.getMainConfig().isAsyncWorldGenerate()) {
             try {

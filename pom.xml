@@ -64,7 +64,7 @@
 
   <profiles>
       <profile>
-          <id>release</id>
+          <id>github</id>
       </profile>
   </profiles>
 
