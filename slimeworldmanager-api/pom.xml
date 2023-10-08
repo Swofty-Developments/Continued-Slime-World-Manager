@@ -24,7 +24,7 @@
 
     <distributionManagement>
         <repository>
-            <id>dungeons-github</id>
+            <id>github</id>
             <name>GitHub OWNER Apache Maven Packages</name>
             <url>https://github.com/Swofty-Developments/Continued-Slime-World-Manager</url>
         </repository>
