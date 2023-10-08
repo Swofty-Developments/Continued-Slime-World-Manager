@@ -12,16 +12,7 @@
         <module>slimeworldmanager-nms-v1_8_R3</module>
         <module>slimeworldmanager-plugin</module>
         <module>slimeworldmanager-importer</module>
-        <module>slimeworldmanager-nms-v1_9_R1</module>
-        <module>slimeworldmanager-nms-v1_9_R2</module>
-        <module>slimeworldmanager-nms-v1_10_R1</module>
-        <module>slimeworldmanager-nms-v1_11_R1</module>
-        <module>slimeworldmanager-nms-v1_12_R1</module>
-        <module>slimeworldmanager-nms-v1_13_R1</module>
-        <module>slimeworldmanager-nms-v1_13_R2</module>
-        <module>slimeworldmanager-nms-v1_14_R1</module>
         <module>slimeworldmanager-classmodifier</module>
-        <module>slimeworldmanager-nms-v1_15_R1</module>
     </modules>
 
     <repositories>
@@ -34,19 +25,12 @@
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>bintray-cy6ergn0m-maven</id>
-            <name>bintray-plugins</name>
-            <url>http://dl.bintray.com/cy6ergn0m/maven</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
+            <version>1.18.22</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -60,13 +44,6 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
-    
-    <scm>
-        <connection>scm:git:git@github.com:Grinderwolf/Slime-World-Manager.git</connection>
-        <developerConnection>scm:git:git@github.com:Grinderwolf/Slime-World-Manager.git</developerConnection>
-        <url>git@github.com:Grinderwolf/Slime-World-Manager.git</url>
-      <tag>HEAD</tag>
-  </scm>
     
     <build>
         <plugins>
@@ -88,36 +65,7 @@
   <profiles>
       <profile>
           <id>release</id>
-          <build>
-              <plugins>
-                  <plugin>
-                      <groupId>cy.github</groupId>
-                      <artifactId>github-release-plugin</artifactId>
-                      <version>0.5.1</version>
-                      <configuration>
-                          <tagName>${project.version}</tagName>
-                          <releaseTitle>${project.artifactId}-${project.version}</releaseTitle>
-                          <serverId>github</serverId>
-                      </configuration>
-                      <executions>
-                          <execution>
-                              <goals>
-                                  <goal>gh-upload</goal>
-                              </goals>
-                              <phase>deploy</phase>
-                          </execution>
-                      </executions>
-                  </plugin>
-              </plugins>
-          </build>
       </profile>
   </profiles>
-
-  <distributionManagement>
-        <repository>
-            <id>glaremasters</id>
-            <url>https://repo.glaremasters.me/repository/concuncan/</url>
-        </repository>
-  </distributionManagement>
 
 </project>
