@@ -22,4 +22,11 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>dungeons-github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://github.com/Swofty-Developments/Continued-Slime-World-Manager</url>
+        </repository>
+    </distributionManagement>
 </project>
