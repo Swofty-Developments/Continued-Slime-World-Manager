@@ -9,7 +9,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,8 +24,24 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
+    - name: Install Buildtools
+      uses: SpraxDev/Action-SpigotMC@v4
+      with:
+        versions: 1.8.8
+    
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+      
+    - name: Add Jar to GitHub releases
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "latest"
+        prerelease: false
+        title: "Automatic Build from Pull Request"
+        files: |
+          slimeworldmanager-plugin/target/*.jar
+          slimeworldmanager-classmodifier/target/*.jar
 
     - name: Publish to GitHub Packages Apache Maven
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
