@@ -19,6 +19,7 @@ public class DatasourcesConfig {
         @Setting("enabled") private boolean enabled = false;
 
         @Setting("host") private String host = "127.0.0.1";
+        @Setting("usessl") private boolean usessl = false;
         @Setting("port") private int port = 3306;
 
         @Setting("username") private String username = "slimeworldmanager";

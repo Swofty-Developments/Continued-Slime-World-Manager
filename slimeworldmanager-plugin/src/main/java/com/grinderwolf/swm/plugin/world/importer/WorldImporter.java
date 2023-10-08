@@ -36,20 +36,8 @@ public class WorldImporter {
 
         LevelData data = readLevelData(levelFile);
 
-        // World version
-        byte worldVersion;
-
-        if (data.getVersion() == -1) { // DataVersion tag was added in 1.9
-            worldVersion = 0x01;
-        } else if (data.getVersion() < 818) {
-            worldVersion = 0x02; // 1.9 world
-        } else if (data.getVersion() < 1501) {
-            worldVersion = 0x03; // 1.11 world
-        } else if (data.getVersion() < 1517) {
-            worldVersion = 0x04; // 1.13 world
-        } else {
-            worldVersion = 0x05; // 1.14 world
-        }
+        // World version for 1.8
+        byte worldVersion = 0x01;
 
         // Chunks
         File regionDir = new File(worldDir, "region");

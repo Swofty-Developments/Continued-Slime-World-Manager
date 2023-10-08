@@ -6,7 +6,8 @@ mysql:
   port: 3306
   username: slimeworldmanager
   password: ''
-  database: slimeworldmanager
+  database: slimeworldmanager  '
+  usessl: false
 mongodb:
   enabled: false
   host: 127.0.0.1
