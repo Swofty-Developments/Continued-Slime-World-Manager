@@ -1,6 +1,6 @@
 ## How does Slime World Manager work?
 
-In short, SWM is a bukkit world manager plugin, like Multiverse or MultiWorld. However, these plugins are limited to loading traditional Minecraft worlds - and they're great at it, too. SWM uses the Slime Region Format, which has some advantages over the traditional MC format - you can read more about this [here](https://www.spigotmc.org/resources/slimeworldmanager.69974/).
+In short, SWM is a bukkit world manager plugin, like Multiverse or MultiWorld. However, these plugins are limited to loading traditional Minecraft worlds - and they're great at it, too. SWM uses the Slime Region Format, which has some advantages over the traditional MC format - you can read more about this [here](https://github.com/Swofty-Developments/Continued-Slime-World-Manager).
 
 ## How can I use SWM?
 

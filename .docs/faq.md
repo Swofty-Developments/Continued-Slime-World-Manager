@@ -3,19 +3,11 @@
 
 * Which Spigot versions is this compatible with?
 
-Currently, SWM can run on any Spigot version from 1.8.8 up to 1.15.2.
+Currently, SWM can run on any Spigot version from 1.8.8
 
 * Can I override the default world?
 
 Yes, you can! However, that requires doing some extra steps. Take a look at the [Installing Slime World Manager](usage/install.md) page.
-
-* My server stops when booting up with a 'Failed to find ClassModifier classes' error.
-
-That's because you haven't followed the extra steps needed for Spigot 1.14 correctly. Go to the [Installing Slime World Manager](usage/install.md) and follow the steps described there.
-
-* I'm getting a `javassist.CannotCompileException: [source error] acceptConnections() not found in net.minecraft.server.v1_14_R1.ServerConnection` error on startup.
-
-You are running an outdated spigot version. Please update to the latest version. If this keeps happening after updating, open an issue.
 
 * Is SWM compatible with Multiverse-Core?
 
