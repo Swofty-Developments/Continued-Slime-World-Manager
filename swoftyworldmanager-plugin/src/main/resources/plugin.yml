@@ -1,0 +1,8 @@
+name: SwoftyWorldManager
+version: ${project.version}
+main: net.swofty.swm.plugin.SWMPlugin
+authors:
+  - Grinderwolf
+  - Swofty
+description: Swofty World Manager is a resource that implements the Slime Region Format, designed by the Hypixel Team to load and save worlds more efficiently.
+api-version: 1.8

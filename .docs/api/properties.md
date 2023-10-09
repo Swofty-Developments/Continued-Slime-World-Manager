@@ -16,6 +16,6 @@ properties.setInt(SlimeProperties.SPAWN_Z, 170);
 ```
 
 
-[1]: ../../slimeworldmanager-api/src/main/java/com/grinderwolf/swm/api/world/properties/SlimeProperty.java
-[2]: ../../slimeworldmanager-api/src/main/java/com/grinderwolf/swm/api/world/properties/SlimeProperties.java
-[3]: ../../slimeworldmanager-api/src/main/java/com/grinderwolf/swm/api/world/properties/SlimePropertyMap.java
+[1]: ../../swoftyworldmanager-api/src/main/java/com/grinderwolf/swm/api/world/properties/SlimeProperty.java
+[2]: ../../swoftyworldmanager-api/src/main/java/com/grinderwolf/swm/api/world/properties/SlimeProperties.java
+[3]: ../../swoftyworldmanager-api/src/main/java/com/grinderwolf/swm/api/world/properties/SlimePropertyMap.java

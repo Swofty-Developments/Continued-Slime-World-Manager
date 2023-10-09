@@ -1,0 +1,5 @@
+{
+    if (net.swofty.swm.clsm.ClassModifier.isCustomWorld($0.b)) {
+        return;
+    }
+}

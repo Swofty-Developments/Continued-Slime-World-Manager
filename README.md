@@ -34,15 +34,15 @@ Javadocs can be found [here](https://swofty-developments.github.io/Continued-Sli
 
 ## Wiki Overview
 * Plugin Usage
-   * [Installing Slime World Manager](.docs/usage/install.md)
-   * [Using Slime World Manager](.docs/usage/using.md)
+   * [Installing Continued Slime World Manager](.docs/usage/install.md)
+   * [Using Continued Slime World Manager](.docs/usage/using.md)
    * [Commands and permissions](.docs/usage/commands-and-permissions.md)
 * Configuration
    * [Setting up the data sources](.docs/config/setup-data-sources.md)
    * [Converting traditional worlds into the SRF](.docs/config/convert-world-to-srf.md)
    * [Configuring worlds](.docs/config/configure-world.md)
    * [Async world generation](.docs/config/async-world-generation.md)
-* SWM API
+* CSWM API
    * [Getting started](.docs/api/setup-dev.md)
    * [World Properties](.docs/api/properties.md)
    * [Loading a world](.docs/api/load-world.md)

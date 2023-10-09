@@ -1,0 +1,5 @@
+{
+    if (net.swofty.swm.clsm.ClassModifier.skipWorldAdd(((org.bukkit.craftbukkit.v1_10_R1.CraftWorld) $1).getHandle())) {
+        return;
+    }
+}

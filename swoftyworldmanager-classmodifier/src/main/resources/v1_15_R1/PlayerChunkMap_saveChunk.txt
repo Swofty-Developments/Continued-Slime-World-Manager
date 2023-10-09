@@ -1,0 +1,5 @@
+{
+    if (net.swofty.swm.clsm.ClassModifier.saveChunk($0.world, $1)) {
+        return false;
+    }
+}

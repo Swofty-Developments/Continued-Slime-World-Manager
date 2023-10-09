@@ -2,17 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.grinderwolf</groupId>
-    <artifactId>slimeworldmanager</artifactId>
+    <groupId>net.swofty</groupId>
+    <artifactId>swoftyworldmanager</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <modules>
-        <module>slimeworldmanager-api</module>
-        <module>slimeworldmanager-nms-common</module>
-        <module>slimeworldmanager-nms-v1_8_R3</module>
-        <module>slimeworldmanager-plugin</module>
-        <module>slimeworldmanager-importer</module>
-        <module>slimeworldmanager-classmodifier</module>
+        <module>swoftyworldmanager-api</module>
+        <module>swoftyworldmanager-nms-common</module>
+        <module>swoftyworldmanager-nms-v1_8_R3</module>
+        <module>swoftyworldmanager-plugin</module>
+        <module>swoftyworldmanager-importer</module>
+        <module>swoftyworldmanager-classmodifier</module>
     </modules>
 
     <repositories>
