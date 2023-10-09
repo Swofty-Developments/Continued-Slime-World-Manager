@@ -12,14 +12,14 @@ Correct, this is at the core of this continuations design. For versions 1.17 and
 
 Releases are auto deployed on push onto the GitHub releases page which can be found [here](https://github.com/Swofty-Developments/Continued-Slime-World-Manager/releases). Updates are also periodically sent within my discord server located at [discord.gg/atlasmc](discord.gg/atlasmc).
 
-## Using SWM in your plugin
+## Using CSWM in your plugin
 
 #### Maven
 ```  
 <dependencies>  
   <dependency>  
     <groupId>net.swofty</groupId>  
-    <artifactId>slimeworldmanager-api</artifactId>  
+    <artifactId>swoftyworldmanager-api</artifactId>  
     <version>INSERT LATEST VERSION HERE</version>  
   </dependency>  
 </dependencies>  
