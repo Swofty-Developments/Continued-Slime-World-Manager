@@ -26,7 +26,11 @@ Releases are auto deployed on push onto the GitHub releases page which can be fo
 ```  
 
 #### Gradle
-Gradle support is still incoming
+```
+dependencies {
+    implementation 'net.swofty:swoftyworldmanager-api:INSERT LATEST VERSION HERE'
+}
+```
 
 #### Javadocs
 
