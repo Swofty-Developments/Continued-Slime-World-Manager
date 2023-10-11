@@ -60,15 +60,15 @@ public abstract class SWMCommand implements CommandExecutor, TabCompleter {
         public SWMCommand command;
 
         public SlimeCommandHandler() {
-            super("swm", "Manage SlimeWorldManager", "", new ArrayList<>());
+            super("swm", "Manage SlimeWorldManager", "", new ArrayList<>(Collections.singletonList("cswm")));
         }
 
         @Override
         public boolean execute(CommandSender sender, String commandLabel, String[] args) {
             if (args.length == 0) {
                 sender.sendMessage((sender instanceof Player) ?
-                        Logging.COMMAND_PREFIX + "§dContinued Slime World Manager §7is a plugin by §cSwofty-Developments §7that implements the Slime Region Format based on §bSlime World Manager. To check out the help page, type §e/swm help§7." :
-                                Logging.CONSOLE_PREFIX + "Continued World Manager is a plugin by SwoftyDevelopments that implements the Slime Region Format based on Slime World Manager. To check out the help page, type /swm help.");
+                        Logging.COMMAND_PREFIX + "§dContinued Slime World Manager §7is a plugin by §cSwofty-Developments §7that implements the Slime Region Format based on §bSlime World Manager. §7To check out the help page, type §e/cswm help§7." :
+                                Logging.CONSOLE_PREFIX + "Continued World Manager is a plugin by SwoftyDevelopments that implements the Slime Region Format based on Slime World Manager. To check out the help page, type /cswm help.");
                 return false;
             }
 

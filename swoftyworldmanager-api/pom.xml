@@ -7,7 +7,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>net.swofty</groupId>
     <artifactId>swoftyworldmanager-api</artifactId>
+    <packaging>jar</packaging>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <build>
         <plugins>
@@ -22,11 +29,28 @@
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
+    <profiles>
+        <profile>
             <id>github</id>
-            <name>GitHub OWNER Apache Maven Packages</name>
-            <url>https://github.com/Swofty-Developments/Continued-Slime-World-Manager</url>
-        </repository>
-    </distributionManagement>
+            <activation>
+                <property>
+                    <name>useGitHubPackages</name>
+                    <value>true</value>
+                </property>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub OWNER Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/Swofty-Developments/Continued-Slime-World-Manager</url>
+                </repository>
+                <snapshotRepository>
+                    <id>github</id>
+                    <name>GitHub OWNER Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/Swofty-Developments/Continued-Slime-World-Manager</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>
