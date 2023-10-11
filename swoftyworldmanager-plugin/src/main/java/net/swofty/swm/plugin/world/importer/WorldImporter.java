@@ -38,9 +38,6 @@ public class WorldImporter {
 
         LevelData data = readLevelData(levelFile);
 
-        // World version for 1.8
-        byte worldVersion = 0x01;
-
         // Chunks
         File regionDir = new File(worldDir, "region");
 
@@ -51,7 +48,7 @@ public class WorldImporter {
         Map<Long, SlimeChunk> chunks = new HashMap<>();
 
         for (File file : regionDir.listFiles((dir, name) -> name.endsWith(".mca"))) {
-            chunks.putAll(loadChunks(file, worldVersion).stream().collect(Collectors.toMap((chunk) -> ((long) chunk.getZ()) * Integer.MAX_VALUE + ((long) chunk.getX()), (chunk) -> chunk)));
+            chunks.putAll(loadChunks(file).stream().collect(Collectors.toMap((chunk) -> ((long) chunk.getZ()) * Integer.MAX_VALUE + ((long) chunk.getX()), (chunk) -> chunk)));
         }
 
         if (chunks.isEmpty()) {
@@ -89,7 +86,7 @@ public class WorldImporter {
         propertyMap.setInt(SlimeProperties.SPAWN_Z, data.getSpawnZ());
 
         return new CraftSlimeWorld(null, worldDir.getName(), chunks, new CompoundTag("", extraData),
-                maps, worldVersion, propertyMap, false, true);
+                maps, propertyMap, false, true);
     }
 
     private static CompoundTag loadMap(File mapFile) throws IOException {
@@ -139,7 +136,7 @@ public class WorldImporter {
         throw new InvalidWorldException(file.getParentFile());
     }
 
-    private static List<SlimeChunk> loadChunks(File file, byte worldVersion) throws IOException {
+    private static List<SlimeChunk> loadChunks(File file) throws IOException {
         byte[] regionByteArray = Files.readAllBytes(file.toPath());
         DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(regionByteArray));
 
@@ -176,7 +173,7 @@ public class WorldImporter {
 
                 CompoundTag levelCompound = (CompoundTag) globalMap.get("Level");
 
-                return readChunk(levelCompound, worldVersion);
+                return readChunk(levelCompound);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -186,7 +183,7 @@ public class WorldImporter {
         return loadedChunks;
     }
 
-    private static SlimeChunk readChunk(CompoundTag compound, byte worldVersion) {
+    private static SlimeChunk readChunk(CompoundTag compound) {
         int chunkX = compound.getAsIntTag("xPos").get().getValue();
         int chunkZ = compound.getAsIntTag("zPos").get().getValue();
         Optional<String> status = compound.getStringValue("Status");
@@ -211,15 +208,11 @@ public class WorldImporter {
         Optional<CompoundTag> optionalHeightMaps = compound.getAsCompoundTag("Heightmaps");
         CompoundTag heightMapsCompound;
 
-        if (worldVersion >= 0x04) {
-            heightMapsCompound = optionalHeightMaps.orElse(new CompoundTag("", new CompoundMap()));
-        } else {
-            // Pre 1.13 world
+        // Pre 1.13 world
 
-            int[] heightMap = compound.getIntArrayValue("HeightMap").orElse(new int[256]);
-            heightMapsCompound = new CompoundTag("", new CompoundMap());
-            heightMapsCompound.getValue().put("heightMap", new IntArrayTag("heightMap", heightMap));
-        }
+        int[] heightMap = compound.getIntArrayValue("HeightMap").orElse(new int[256]);
+        heightMapsCompound = new CompoundTag("", new CompoundMap());
+        heightMapsCompound.getValue().put("heightMap", new IntArrayTag("heightMap", heightMap));
 
         List<CompoundTag> tileEntities = ((ListTag<CompoundTag>) compound.getAsListTag("TileEntities")
                 .orElse(new ListTag<>("TileEntities", TagType.TAG_COMPOUND, new ArrayList<>()))).getValue();
@@ -241,25 +234,14 @@ public class WorldImporter {
             ListTag<CompoundTag> paletteTag;
             long[] blockStatesArray;
 
-            if (worldVersion < 0x04) {
-                dataArray = new NibbleArray(sectionTag.getByteArrayValue("Data").get());
+            dataArray = new NibbleArray(sectionTag.getByteArrayValue("Data").get());
 
-                if (isEmpty(blocks)) { // Just skip it
-                    continue;
-                }
-
-                paletteTag = null;
-                blockStatesArray = null;
-            } else {
-                dataArray = null;
-
-                paletteTag = (ListTag<CompoundTag>) sectionTag.getAsListTag("Palette").orElse(null);
-                blockStatesArray = sectionTag.getLongArrayValue("BlockStates").orElse(null);
-
-                if (paletteTag == null || blockStatesArray == null || isEmpty(blockStatesArray)) { // Skip it
-                    continue;
-                }
+            if (isEmpty(blocks)) { // Just skip it
+                continue;
             }
+
+            paletteTag = null;
+            blockStatesArray = null;
 
             NibbleArray blockLightArray = sectionTag.getValue().containsKey("BlockLight") ? new NibbleArray(sectionTag.getByteArrayValue("BlockLight").get()) : null;
             NibbleArray skyLightArray = sectionTag.getValue().containsKey("SkyLight") ? new NibbleArray(sectionTag.getByteArrayValue("SkyLight").get()) : null;

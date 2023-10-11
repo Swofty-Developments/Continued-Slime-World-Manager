@@ -20,7 +20,20 @@ public class subCommand_help extends SWMCommand implements CommandCooldown {
 
     static {
         commands = new HashMap<>();
-        commands.put("swm import <path-to-world> <datasource> [new-world-name]", "Convert a world to the slime format and save it.");
+        commands.put("cswm import <path-to-world> <datasource> [new-world-name]", "Convert a world to the slime format and save it");
+        commands.put("cswm clone <template-world> <world-name> [new-data-source]", "Clones a world");
+        commands.put("cswm create <world> <data-source>", "Create an empty world");
+        commands.put("cswm dslist <data-source> [page]", "List all worlds inside a data source");
+        commands.put("cswm delete <world> [data-source]", "Delete a world");
+        commands.put("cswm goto <world> [player]", "Teleport yourself (or someone else) to a world");
+        commands.put("cswm help", "Shows this page");
+        commands.put("cswm loadtemplate <template-world> <world-name>", "Creates a temporary world using another as a template. This world will never be stored.");
+        commands.put("cswm load <world>", "Load a world");
+        commands.put("cswm migrate <world> <new-data-source>", "Migrate a world from one data source to another");
+        commands.put("cswm reload", "Reloads the config files");
+        commands.put("cswm unload <world>", "Unload a world");
+        commands.put("cswm version", "Shows the plugin version");
+        commands.put("cswm list [slime] [page]", "List all worlds. To only list slime worlds, use the 'slime' argument");
     }
 
     @Override

@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.List;
 
 @CommandParameters(description = "Loads a template world into SWM which wont be saved", inGameOnly = false, permission = "swm.loadworld.template")
-public class subCommand_loadtemplateworld extends SWMCommand implements CommandCooldown {
+public class subCommand_loadtemplate extends SWMCommand implements CommandCooldown {
     @Override
     public long cooldownSeconds() {
         return 0;
@@ -34,7 +34,7 @@ public class subCommand_loadtemplateworld extends SWMCommand implements CommandC
     @Override
     public void run(CommandSource sender, String[] args) {
         if (args.length == 1) {
-            sender.send("§cUsage: /swm load-template <template-world> <world-name>");
+            sender.send("§cUsage: /swm loadtemplate <template-world> <world-name>");
             return;
         }
 

@@ -15,7 +15,6 @@ import net.swofty.swm.plugin.command.CommandLoader;
 import net.swofty.swm.plugin.command.SWMCommand;
 import net.swofty.swm.plugin.loaders.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
-import net.swofty.swm.plugin.upgrade.WorldUpgrader;
 import net.swofty.swm.plugin.world.WorldUnlocker;
 import net.swofty.swm.plugin.world.importer.WorldImporter;
 import lombok.Getter;
@@ -227,17 +226,10 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
 
         try {
             world = LoaderUtils.deserializeWorld(loader, worldName, serializedWorld, propertyMap, readOnly);
-
-            if (world.getVersion() > nms.getWorldVersion()) {
-                WorldUpgrader.downgradeWorld(world);
-            } else if (world.getVersion() < nms.getWorldVersion()) {
-                WorldUpgrader.upgradeWorld(world);
-            }
         } catch (Exception ex) {
             if (!readOnly) { // Unlock the world as we're not using it
                 loader.unlockWorld(worldName);
             }
-
             throw ex;
         }
 
@@ -266,7 +258,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
         Logging.info("Creating empty world " + worldName + ".");
         long start = System.currentTimeMillis();
         CraftSlimeWorld world = new CraftSlimeWorld(loader, worldName, new HashMap<>(), new CompoundTag("",
-                new CompoundMap()), new ArrayList<>(), nms.getWorldVersion(), propertyMap, readOnly, !readOnly);
+                new CompoundMap()), new ArrayList<>(), propertyMap, readOnly, !readOnly);
         loader.saveWorld(worldName, world.serialize(), !readOnly);
 
         Logging.info("World " + worldName + " created in " + (System.currentTimeMillis() - start) + "ms.");

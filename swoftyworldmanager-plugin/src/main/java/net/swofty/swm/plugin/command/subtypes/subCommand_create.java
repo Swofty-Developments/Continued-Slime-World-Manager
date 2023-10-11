@@ -11,6 +11,7 @@ import net.swofty.swm.plugin.command.SWMCommand;
 import net.swofty.swm.plugin.config.ConfigManager;
 import net.swofty.swm.plugin.config.WorldData;
 import net.swofty.swm.plugin.config.WorldsConfig;
+import net.swofty.swm.plugin.loaders.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
 import org.bukkit.*;
 import org.bukkit.command.CommandSender;
@@ -20,11 +21,11 @@ import java.io.IOException;
 import java.util.List;
 
 @CommandParameters(description = "Creates an empty world", inGameOnly = false, permission = "swm.createworld")
-public class subCommand_createworld extends SWMCommand {
+public class subCommand_create extends SWMCommand {
     @Override
     public void run(CommandSource sender, String[] args) {
         if (args.length <= 1) {
-            sender.send("§cUsage: /swm createworld <world> <data-source>");
+            sender.send("§cUsage: /swm create <world> <data-source>");
             return;
         }
 
@@ -108,6 +109,8 @@ public class subCommand_createworld extends SWMCommand {
 
     @Override
     public List<String> tabCompleters(CommandSender sender, String alias, String[] args) {
+        if (args.length == 3)
+            return LoaderUtils.getAvailableLoadersNames();
         return null;
     }
 }

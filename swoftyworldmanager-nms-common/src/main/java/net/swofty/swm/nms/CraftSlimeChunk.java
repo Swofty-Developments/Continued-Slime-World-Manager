@@ -12,7 +12,6 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-@AllArgsConstructor
 public class CraftSlimeChunk implements SlimeChunk {
 
     private final String worldName;
@@ -25,7 +24,4 @@ public class CraftSlimeChunk implements SlimeChunk {
     private final int[] biomes;
     private final List<CompoundTag> tileEntities;
     private final List<CompoundTag> entities;
-
-    // Optional data for 1.13 world upgrading
-    private CompoundTag upgradeData;
 }

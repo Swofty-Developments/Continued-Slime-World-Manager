@@ -20,8 +20,8 @@ If your plugin wants to use Slime World Manager add the following in your pom.xm
 ```
 ```xml
 <dependency>
-    <groupId>com.grinderwolf</groupId>
-    <artifactId>slimeworldmanager-api</artifactId>
+    <groupId>net.swofty</groupId>
+    <artifactId>swoftyworldmanager-api</artifactId>
     <version>(insert latest version here)</version>
     <scope>provided</scope>
 </dependency>

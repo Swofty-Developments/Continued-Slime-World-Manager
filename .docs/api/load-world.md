@@ -1,6 +1,6 @@
-First, retrieve the SlimeWorldManager plugin API:
+First, retrieve the SwoftyWorldManager plugin API:
 ```java
-SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SlimeWorldManager");
+SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SwoftyWorldManager");
 ```
 Now, you need a loader. A SlimeLoader is a class that reads and stores worlds from a data source. In this case, we'll be using the MySQL loader:
 ```java

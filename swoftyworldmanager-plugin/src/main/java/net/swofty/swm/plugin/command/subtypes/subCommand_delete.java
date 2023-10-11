@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @CommandParameters(description = "Deletes a world", inGameOnly = false, permission = "swm.deleteworld")
-public class subCommand_deleteworld extends SWMCommand {
+public class subCommand_delete extends SWMCommand {
     private final Cache<String, String[]> deleteCache = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.MINUTES).build();
 
     @Override
     public void run(CommandSource sender, String[] args) {
         if (args.length == 0) {
-            sender.send("§cUsage: /swm deleteworld <world> [data-source]");
+            sender.send("§cUsage: /swm delete <world> [data-source]");
             return;
         }
 

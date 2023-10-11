@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 public class FileLoader implements SlimeLoader {
 
-    private static final FilenameFilter WORLD_FILE_FILTER = (dir, name) -> name.endsWith(".slime");
+    private static final FilenameFilter WORLD_FILE_FILTER = (dir, name) -> name.endsWith(".swofty");
 
     private final Map<String, RandomAccessFile> worldFiles = new HashMap<>();
     private final File worldDir;
@@ -47,7 +47,7 @@ public class FileLoader implements SlimeLoader {
         RandomAccessFile file = worldFiles.computeIfAbsent(worldName, (world) -> {
 
             try {
-                return new RandomAccessFile(new File(worldDir, worldName + ".slime"), "rw");
+                return new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "rw");
             } catch (FileNotFoundException ex) {
                 return null; // This is never going to happen as we've just checked if the world exists
             }
@@ -79,7 +79,7 @@ public class FileLoader implements SlimeLoader {
 
     @Override
     public boolean worldExists(String worldName) {
-        return new File(worldDir, worldName + ".slime").exists();
+        return new File(worldDir, worldName + ".swofty").exists();
     }
 
     @Override
@@ -99,7 +99,7 @@ public class FileLoader implements SlimeLoader {
         boolean tempFile = worldFile == null;
 
         if (tempFile) {
-            worldFile = new RandomAccessFile(new File(worldDir, worldName + ".slime"), "rw");
+            worldFile = new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "rw");
         }
 
         worldFile.seek(0); // Make sure we're at the start of the file
@@ -140,7 +140,7 @@ public class FileLoader implements SlimeLoader {
         boolean closeOnFinish = false;
 
         if (file == null) {
-            file = new RandomAccessFile(new File(worldDir, worldName + ".slime"), "rw");
+            file = new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "rw");
             closeOnFinish = true;
         }
 
@@ -170,6 +170,6 @@ public class FileLoader implements SlimeLoader {
             throw new UnknownWorldException(worldName);
         }
 
-        new File(worldDir, worldName + ".slime").delete();
+        new File(worldDir, worldName + ".swofty").delete();
     }
 }

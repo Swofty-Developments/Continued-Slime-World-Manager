@@ -15,7 +15,7 @@ import java.nio.file.Files;
 
 public class ConfigManager {
 
-    private static final File PLUGIN_DIR = new File("plugins", "SlimeWorldManager");
+    private static final File PLUGIN_DIR = new File("plugins", "SwoftyWorldManager");
     private static final File MAIN_FILE = new File(PLUGIN_DIR, "main.yml");
     private static final File WORLDS_FILE = new File(PLUGIN_DIR, "worlds.yml");
     private static final File SOURCES_FILE = new File(PLUGIN_DIR, "sources.yml");

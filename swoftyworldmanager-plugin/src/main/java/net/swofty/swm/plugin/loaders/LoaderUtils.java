@@ -308,7 +308,7 @@ public class LoaderUtils {
                 worldPropertyMap = new SlimePropertyMap();
             }
 
-            return new CraftSlimeWorld(loader, worldName, chunks, extraCompound, mapList, worldVersion, worldPropertyMap, readOnly, !readOnly);
+            return new CraftSlimeWorld(loader, worldName, chunks, extraCompound, mapList, worldPropertyMap, readOnly, !readOnly);
         } catch (EOFException ex) {
             throw new CorruptedWorldException(worldName, ex);
         }

@@ -12,7 +12,7 @@ The usage of this tool is disacouraged, as the alternative provided above is fas
 2. Open cmd.
 3. Type this command:
 ```
-java -jar slimeworldmanager-importer-1.0.0.jar <your-world-folder>
+java -jar swoftyworldmanager-importer-1.0.0.jar <your-world-folder>
 ```
 
-It'll automatically scan your world and generate a .slime file inside the same directory you placed it. That's your world!
+It'll automatically scan your world and generate a .swofty file inside the same directory you placed it. That's your world!

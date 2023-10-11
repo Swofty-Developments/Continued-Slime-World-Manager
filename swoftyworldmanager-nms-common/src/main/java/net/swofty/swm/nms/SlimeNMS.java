@@ -14,7 +14,6 @@ public interface SlimeNMS {
     void addWorldToServerList(Object worldObject);
 
     SlimeWorld getSlimeWorld(World world);
-    byte getWorldVersion();
 
     default CompoundTag convertChunk(CompoundTag chunkTag) {
         return chunkTag;

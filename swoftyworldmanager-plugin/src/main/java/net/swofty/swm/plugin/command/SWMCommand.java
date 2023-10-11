@@ -60,7 +60,7 @@ public abstract class SWMCommand implements CommandExecutor, TabCompleter {
         public SWMCommand command;
 
         public SlimeCommandHandler() {
-            super("swm", "Manage SlimeWorldManager", "", new ArrayList<>(Collections.singletonList("cswm")));
+            super("swm", "Manage SwoftyWorldManager", "", new ArrayList<>(Collections.singletonList("cswm")));
         }
 
         @Override

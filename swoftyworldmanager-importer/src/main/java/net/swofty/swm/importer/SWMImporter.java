@@ -47,7 +47,7 @@ public class SWMImporter {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            System.err.println("Usage: java -jar slimeworldmanager-importer-1.0.0.jar <path-to-world-folder>");
+            System.err.println("Usage: java -jar swoftyworldmanager-importer-1.0.0.jar <path-to-world-folder>");
 
             return;
         }
@@ -108,27 +108,15 @@ public class SWMImporter {
                 return;
             }
 
-            // World version
-            byte worldVersion;
-
-            if (data.getVersion() == -1) { // DataVersion tag was added in 1.9
-                worldVersion = 0x01;
-            } else if (data.getVersion() < 818) {
-                worldVersion = 0x02; // 1.9 world
-            } else if (data.getVersion() < 1501) {
-                worldVersion = 0x03; // 1.11 world
-            } else if (data.getVersion() < 1517) {
-                worldVersion = 0x04; // 1.13 world
-            } else {
-                worldVersion = 0x05; // 1.14 world
+            if (data.getVersion() != -1) {
+                System.out.println("WARNING: This world is from a newer version of Minecraft. Some blocks may not be supported.");
             }
 
-            System.out.println("World version: " + worldVersion);
             List<SlimeChunk> chunks = new ArrayList<>();
 
             for (File file : regionDir.listFiles((dir, name) -> name.endsWith(".mca"))) {
                 try {
-                    chunks.addAll(loadChunks(file, worldVersion));
+                    chunks.addAll(loadChunks(file));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -158,12 +146,12 @@ public class SWMImporter {
 
             try {
                 long start = System.currentTimeMillis();
-                byte[] slimeFormattedWorld = generateSlimeWorld(chunks, worldVersion, data, maps);
+                byte[] slimeFormattedWorld = generateSlimeWorld(chunks, data, maps);
 
                 System.out.println(Chalk.on("World " + worldDir.getName() + " successfully serialized to the Slime Format in "
                         + (System.currentTimeMillis() - start) + "ms!").green());
 
-                File slimeFile = new File(worldDir.getName() + ".slime");
+                File slimeFile = new File(worldDir.getName() + ".swofty");
 
                 slimeFile.createNewFile();
 
@@ -218,7 +206,7 @@ public class SWMImporter {
         return tag;
     }
 
-    private static List<SlimeChunk> loadChunks(File file, byte worldVersion) throws IOException {
+    private static List<SlimeChunk> loadChunks(File file) throws IOException {
         System.out.println("Loading chunks from region file '" + file.getName() + "':");
         byte[] regionByteArray = Files.readAllBytes(file.toPath());
         DataInputStream inputStream = new DataInputStream(new ByteArrayInputStream(regionByteArray));
@@ -256,7 +244,7 @@ public class SWMImporter {
 
                 CompoundTag levelCompound = (CompoundTag) globalMap.get("Level");
 
-                return readChunk(levelCompound, worldVersion);
+                return readChunk(levelCompound);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -267,7 +255,7 @@ public class SWMImporter {
         return loadedChunks;
     }
 
-    private static SlimeChunk readChunk(CompoundTag compound, byte worldVersion) {
+    private static SlimeChunk readChunk(CompoundTag compound) {
         int chunkX = compound.getAsIntTag("xPos").get().getValue();
         int chunkZ = compound.getAsIntTag("zPos").get().getValue();
         Optional<String> status = compound.getStringValue("Status");
@@ -292,15 +280,9 @@ public class SWMImporter {
         Optional<CompoundTag> optionalHeightMaps = compound.getAsCompoundTag("Heightmaps");
         CompoundTag heightMapsCompound;
 
-        if (worldVersion >= 0x04) {
-            heightMapsCompound = optionalHeightMaps.orElse(new CompoundTag("", new CompoundMap()));
-        } else {
-            // Pre 1.13 world
-
-            int[] heightMap = compound.getIntArrayValue("HeightMap").orElse(new int[256]);
-            heightMapsCompound = new CompoundTag("", new CompoundMap());
-            heightMapsCompound.getValue().put("heightMap", new IntArrayTag("heightMap", heightMap));
-        }
+        int[] heightMap = compound.getIntArrayValue("HeightMap").orElse(new int[256]);
+        heightMapsCompound = new CompoundTag("", new CompoundMap());
+        heightMapsCompound.getValue().put("heightMap", new IntArrayTag("heightMap", heightMap));
 
         List<CompoundTag> tileEntities = ((ListTag<CompoundTag>) compound.getAsListTag("TileEntities")
                 .orElse(new ListTag<>("TileEntities", TagType.TAG_COMPOUND, new ArrayList<>()))).getValue();
@@ -322,25 +304,14 @@ public class SWMImporter {
             ListTag<CompoundTag> paletteTag;
             long[] blockStatesArray;
 
-            if (worldVersion < 0x04) {
-                dataArray = new NibbleArray(sectionTag.getByteArrayValue("Data").get());
+            dataArray = new NibbleArray(sectionTag.getByteArrayValue("Data").get());
 
-                if (isEmpty(blocks)) { // Just skip it
-                    continue;
-                }
-
-                paletteTag = null;
-                blockStatesArray = null;
-            } else {
-                dataArray = null;
-
-                paletteTag = (ListTag<CompoundTag>) sectionTag.getAsListTag("Palette").orElse(null);
-                blockStatesArray = sectionTag.getLongArrayValue("BlockStates").orElse(null);
-
-                if (paletteTag == null || blockStatesArray == null || isEmpty(blockStatesArray)) { // Skip it
-                    continue;
-                }
+            if (isEmpty(blocks)) { // Just skip it
+                continue;
             }
+
+            paletteTag = null;
+            blockStatesArray = null;
 
             NibbleArray blockLightArray = sectionTag.getValue().containsKey("BlockLight") ? new NibbleArray(sectionTag.getByteArrayValue("BlockLight").get()) : null;
             NibbleArray skyLightArray = sectionTag.getValue().containsKey("SkyLight") ? new NibbleArray(sectionTag.getByteArrayValue("SkyLight").get()) : null;
@@ -387,7 +358,7 @@ public class SWMImporter {
         return true;
     }
 
-    private static byte[] generateSlimeWorld(List<SlimeChunk> chunks, byte worldVersion, LevelData levelData, List<CompoundTag> worldMaps) {
+    private static byte[] generateSlimeWorld(List<SlimeChunk> chunks, LevelData levelData, List<CompoundTag> worldMaps) {
         List<SlimeChunk> sortedChunks = new ArrayList<>(chunks);
         sortedChunks.sort(Comparator.comparingLong(chunk -> (long) chunk.getZ() * Integer.MAX_VALUE + (long) chunk.getX()));
 
@@ -400,7 +371,7 @@ public class SWMImporter {
             outStream.write(SlimeFormat.SLIME_VERSION);
 
             // World version
-            outStream.writeByte(worldVersion);
+            // outStream.writeByte(worldVersion);
 
             // Lowest chunk coordinates
             int minX = sortedChunks.stream().mapToInt(SlimeChunk::getX).min().getAsInt();
@@ -431,7 +402,7 @@ public class SWMImporter {
             writeBitSetAsBytes(outStream, chunkBitset, chunkMaskSize);
 
             // Chunks
-            byte[] chunkData = serializeChunks(sortedChunks, worldVersion);
+            byte[] chunkData = serializeChunks(sortedChunks);
             byte[] compressedChunkData = Zstd.compress(chunkData);
 
             outStream.writeInt(compressedChunkData.length);
@@ -512,29 +483,20 @@ public class SWMImporter {
         }
     }
 
-    private static byte[] serializeChunks(List<SlimeChunk> chunks, byte worldVersion) throws IOException {
+    private static byte[] serializeChunks(List<SlimeChunk> chunks) throws IOException {
         ByteArrayOutputStream outByteStream = new ByteArrayOutputStream(16384);
         DataOutputStream outStream = new DataOutputStream(outByteStream);
 
         for (SlimeChunk chunk : chunks) {
             // Height Maps
-            if (worldVersion >= 0x04) {
-                byte[] heightMaps = serializeCompoundTag(chunk.getHeightMaps());
-                outStream.writeInt(heightMaps.length);
-                outStream.write(heightMaps);
-            } else {
-                int[] heightMap = chunk.getHeightMaps().getIntArrayValue("heightMap").get();
+            int[] heightMap = chunk.getHeightMaps().getIntArrayValue("heightMap").get();
 
-                for (int i = 0; i < 256; i++) {
-                    outStream.writeInt(heightMap[i]);
-                }
+            for (int i = 0; i < 256; i++) {
+                outStream.writeInt(heightMap[i]);
             }
 
             // Biomes
             int[] biomes = chunk.getBiomes();
-            if (worldVersion >= 0x04) {
-                outStream.writeInt(biomes.length);
-            }
 
             for (int biome : biomes) {
                 outStream.writeInt(biome);
@@ -564,30 +526,8 @@ public class SWMImporter {
                 }
 
                 // Block Data
-                if (worldVersion >= 0x04) {
-                    // Palette
-                    List<CompoundTag> palette = section.getPalette().getValue();
-                    outStream.writeInt(palette.size());
-
-                    for (CompoundTag value : palette) {
-                        byte[] serializedValue = serializeCompoundTag(value);
-
-                        outStream.writeInt(serializedValue.length);
-                        outStream.write(serializedValue);
-                    }
-
-                    // Block states
-                    long[] blockStates = section.getBlockStates();
-
-                    outStream.writeInt(blockStates.length);
-
-                    for (long value : section.getBlockStates()) {
-                        outStream.writeLong(value);
-                    }
-                } else {
-                    outStream.write(section.getBlocks());
-                    outStream.write(section.getData().getBacking());
-                }
+                outStream.write(section.getBlocks());
+                outStream.write(section.getData().getBacking());
 
                 // Sky Light
                 boolean hasSkyLight = section.getSkyLight() != null;

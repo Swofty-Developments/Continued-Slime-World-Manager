@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @CommandParameters(description = "Lists all loaded worlds in SWM", inGameOnly = false, permission = "swm.listworld")
-public class subCommand_listworld extends SWMCommand {
+public class subCommand_list extends SWMCommand {
 
     private static final int MAX_ITEMS_PER_PAGE = 5;
 

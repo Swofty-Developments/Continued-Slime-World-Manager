@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @CommandParameters(description = "Migrates a world from one data source to another", inGameOnly = false, permission = "swm.migrate")
-public class subCommand_migrateworld extends SWMCommand implements CommandCooldown {
+public class subCommand_migrate extends SWMCommand implements CommandCooldown {
     @Override
     public long cooldownSeconds() {
         return 0;
