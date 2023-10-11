@@ -3,7 +3,6 @@ package net.swofty.swm.nms.v1_8_R3;
 import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.properties.SlimeProperties;
 import net.swofty.swm.nms.CraftSlimeWorld;
-import net.swofty.swm.nms.SlimeNMS;
 import lombok.Getter;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import net.minecraft.server.v1_8_R3.WorldServer;
@@ -16,7 +15,7 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
 @Getter
-public class v1_8_R3SlimeNMS implements SlimeNMS {
+public class SlimeNMS {
 
     private static final Logger LOGGER = LogManager.getLogger("SWM");
 
@@ -28,16 +27,15 @@ public class v1_8_R3SlimeNMS implements SlimeNMS {
     private WorldServer defaultNetherWorld;
     private WorldServer defaultEndWorld;
 
-    public v1_8_R3SlimeNMS() {
+    public SlimeNMS() {
         try {
             CraftCLSMBridge.initialize(this);
         }  catch (NoClassDefFoundError ex) {
             LOGGER.error("Failed to find ClassModifier classes. Are you sure you installed it correctly?");
-            System.exit(1); // No ClassModifier, no party
+            System.exit(1); // No ClassModifier, no party, sadge
         }
     }
 
-    @Override
     public void setDefaultWorlds(SlimeWorld normalWorld, SlimeWorld netherWorld, SlimeWorld endWorld) {
         if (normalWorld != null) {
             World.Environment env = World.Environment.valueOf(normalWorld.getPropertyMap().getValue(SlimeProperties.ENVIRONMENT).toUpperCase());
@@ -62,7 +60,6 @@ public class v1_8_R3SlimeNMS implements SlimeNMS {
         loadingDefaultWorlds = false;
     }
 
-    @Override
     public Object createNMSWorld(SlimeWorld world) {
         CustomDataManager dataManager = new CustomDataManager(world);
         MinecraftServer mcServer = MinecraftServer.getServer();
@@ -84,12 +81,6 @@ public class v1_8_R3SlimeNMS implements SlimeNMS {
         return new CustomWorldServer((CraftSlimeWorld) world, dataManager, dimension);
     }
 
-    @Override
-    public void generateWorld(SlimeWorld world) {
-        addWorldToServerList(createNMSWorld(world));
-    }
-
-    @Override
     public void addWorldToServerList(Object worldObject) {
         if (!(worldObject instanceof WorldServer)) {
             throw new IllegalArgumentException("World object must be an instance of WorldServer!");
@@ -117,7 +108,6 @@ public class v1_8_R3SlimeNMS implements SlimeNMS {
         LOGGER.info("World " + worldName + " loaded in " + (System.currentTimeMillis() - startTime) + "ms.");
     }
 
-    @Override
     public SlimeWorld getSlimeWorld(World world) {
         CraftWorld craftWorld = (CraftWorld) world;
 

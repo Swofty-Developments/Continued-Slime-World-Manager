@@ -8,7 +8,7 @@ import net.minecraft.server.v1_8_R3.WorldServer;
 @RequiredArgsConstructor
 public class CraftCLSMBridge implements CLSMBridge {
 
-    private final v1_8_R3SlimeNMS nmsInstance;
+    private final SlimeNMS nmsInstance;
 
     @Override
     public Object[] getDefaultWorlds() {
@@ -39,7 +39,7 @@ public class CraftCLSMBridge implements CLSMBridge {
         return !worldServer.isReady();
     }
 
-    static void initialize(v1_8_R3SlimeNMS instance) {
+    static void initialize(SlimeNMS instance) {
         ClassModifier.setLoader(new CraftCLSMBridge(instance));
     }
 }

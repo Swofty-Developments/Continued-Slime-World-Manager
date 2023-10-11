@@ -126,17 +126,6 @@ public class LoaderUtils {
                 throw new NewerFormatException(version);
             }
 
-            // World version
-            byte worldVersion;
-
-            if (version >= 6) {
-                worldVersion = dataStream.readByte();
-            } else if (version >= 4) { // In v4 there's just a boolean indicating whether the world is pre-1.13 or post-1.13
-                worldVersion = (byte) (dataStream.readBoolean() ? 0x04 : 0x01);
-            } else {
-                worldVersion = 0; // We'll try to automatically detect it later
-            }
-
             // Chunk
             short minX = dataStream.readShort();
             short minZ = dataStream.readShort();
@@ -222,7 +211,7 @@ public class LoaderUtils {
             Zstd.decompress(mapsTag, compressedMapsTag);
 
             // Chunk deserialization
-            Map<Long, SlimeChunk> chunks = readChunks(worldVersion, version, worldName, minX, minZ, width, depth, chunkBitset, chunkData);
+            Map<Long, SlimeChunk> chunks = readChunks(version, worldName, minX, minZ, width, depth, chunkBitset, chunkData);
 
             // Entity deserialization
             CompoundTag entitiesCompound = readCompoundTag(entities);
@@ -283,20 +272,6 @@ public class LoaderUtils {
                 mapList = new ArrayList<>();
             }
 
-            // v1_13 world format detection for old versions
-            if (worldVersion == 0) {
-                mainLoop:
-                for (SlimeChunk chunk : chunks.values()) {
-                    for (SlimeChunkSection section : chunk.getSections()) {
-                        if (section != null) {
-                            worldVersion = (byte) (section.getBlocks() == null ? 0x04 : 0x01);
-
-                            break mainLoop;
-                        }
-                    }
-                }
-            }
-
             // World properties
             SlimePropertyMap worldPropertyMap = propertyMap;
             Optional<CompoundTag> propertiesTag = extraCompound.getAsCompoundTag("properties");
@@ -319,7 +294,7 @@ public class LoaderUtils {
         return floor == num ? floor : floor - (int) (Double.doubleToRawLongBits(num) >>> 63);
     }
 
-    private static Map<Long, SlimeChunk> readChunks(byte worldVersion, int version, String worldName, int minX, int minZ, int width, int depth, BitSet chunkBitset, byte[] chunkData) throws IOException {
+    private static Map<Long, SlimeChunk> readChunks(int version, String worldName, int minX, int minZ, int width, int depth, BitSet chunkBitset, byte[] chunkData) throws IOException {
         DataInputStream dataStream = new DataInputStream(new ByteArrayInputStream(chunkData));
         Map<Long, SlimeChunk> chunkMap = new HashMap<>();
 
@@ -331,52 +306,26 @@ public class LoaderUtils {
                     // Height Maps
                     CompoundTag heightMaps;
 
-                    if (worldVersion >= 0x04) {
-                        int heightMapsLength = dataStream.readInt();
-                        byte[] heightMapsArray = new byte[heightMapsLength];
-                        dataStream.read(heightMapsArray);
-                        heightMaps = readCompoundTag(heightMapsArray);
+                    int[] heightMap = new int[256];
 
-                        // Height Maps might be null if empty
-                        if (heightMaps == null) {
-                            heightMaps = new CompoundTag("", new CompoundMap());
-                        }
-                    } else {
-                        int[] heightMap = new int[256];
-
-                        for (int i = 0; i < 256; i++) {
-                            heightMap[i] = dataStream.readInt();
-                        }
-
-                        CompoundMap map = new CompoundMap();
-                        map.put("heightMap", new IntArrayTag("heightMap", heightMap));
-
-                        heightMaps = new CompoundTag("", map);
+                    for (int i = 0; i < 256; i++) {
+                        heightMap[i] = dataStream.readInt();
                     }
+
+                    CompoundMap map = new CompoundMap();
+                    map.put("heightMap", new IntArrayTag("heightMap", heightMap));
+
+                    heightMaps = new CompoundTag("", map);
 
                     // Biome array
                     int[] biomes;
 
-                    if (version == 8 && worldVersion < 0x04) {
-                        // Patch the v8 bug: biome array size is wrong for old worlds
-                        dataStream.readInt();
-                    }
-
-                    if (worldVersion >= 0x04) {
-                        int biomesArrayLength = version >= 8 ? dataStream.readInt() : 256;
-                        biomes = new int[biomesArrayLength];
-
-                        for (int i = 0; i < biomes.length; i++) {
-                            biomes[i] = dataStream.readInt();
-                        }
-                    } else {
-                        byte[] byteBiomes = new byte[256];
-                        dataStream.read(byteBiomes);
-                        biomes = toIntArray(byteBiomes);
-                    }
+                    byte[] byteBiomes = new byte[256];
+                    dataStream.read(byteBiomes);
+                    biomes = toIntArray(byteBiomes);
 
                     // Chunk Sections
-                    SlimeChunkSection[] sections = readChunkSections(dataStream, worldVersion, version);
+                    SlimeChunkSection[] sections = readChunkSections(dataStream, version);
 
                     chunkMap.put(((long) minZ + z) * Integer.MAX_VALUE + ((long) minX + x), new CraftSlimeChunk(worldName,minX + x, minZ + z,
                             sections, heightMaps, biomes, new ArrayList<>(), new ArrayList<>()));
@@ -396,7 +345,7 @@ public class LoaderUtils {
         return ret;
     }
 
-    private static SlimeChunkSection[] readChunkSections(DataInputStream dataStream, byte worldVersion, int version) throws IOException {
+    private static SlimeChunkSection[] readChunkSections(DataInputStream dataStream, int version) throws IOException {
         SlimeChunkSection[] chunkSectionArray = new SlimeChunkSection[16];
         byte[] sectionBitmask = new byte[2];
         dataStream.read(sectionBitmask);
@@ -422,60 +371,26 @@ public class LoaderUtils {
                 ListTag<CompoundTag> paletteTag;
                 long[] blockStatesArray;
 
-                // Post 1.13 block format
-                if (worldVersion >= 0x04) {
-                    // Palette
-                    int paletteLength = dataStream.readInt();
-                    List<CompoundTag> paletteList = new ArrayList<>(paletteLength);
+                blockArray = new byte[4096];
+                dataStream.read(blockArray);
 
-                    for (int index = 0; index < paletteLength; index++) {
-                        int tagLength = dataStream.readInt();
-                        byte[] serializedTag = new byte[tagLength];
-                        dataStream.read(serializedTag);
+                // Block Data Nibble Array
+                byte[] dataByteArray = new byte[2048];
+                dataStream.read(dataByteArray);
+                dataArray = new NibbleArray((dataByteArray));
 
-                        paletteList.add(readCompoundTag(serializedTag));
-                    }
-
-                    paletteTag = new ListTag<>("", TagType.TAG_COMPOUND, paletteList);
-
-                    // Block states
-                    int blockStatesArrayLength = dataStream.readInt();
-                    blockStatesArray = new long[blockStatesArrayLength];
-
-                    for (int index = 0; index < blockStatesArrayLength; index++) {
-                        blockStatesArray[index] = dataStream.readLong();
-                    }
-
-                    blockArray = null;
-                    dataArray = null;
-                } else {
-                    blockArray = new byte[4096];
-                    dataStream.read(blockArray);
-
-                    // Block Data Nibble Array
-                    byte[] dataByteArray = new byte[2048];
-                    dataStream.read(dataByteArray);
-                    dataArray = new NibbleArray((dataByteArray));
-
-                    paletteTag = null;
-                    blockStatesArray = null;
-                }
+                paletteTag = null;
+                blockStatesArray = null;
 
                 // Sky Light Nibble Array
                 NibbleArray skyLightArray;
 
-                if (version < 5 || dataStream.readBoolean()) {
+                if (dataStream.readBoolean()) {
                     byte[] skyLightByteArray = new byte[2048];
                     dataStream.read(skyLightByteArray);
                     skyLightArray = new NibbleArray((skyLightByteArray));
                 } else {
                     skyLightArray = null;
-                }
-
-                // HypixelBlocks 3
-                if (version < 4) {
-                    short hypixelBlocksLength = dataStream.readShort();
-                    dataStream.skip(hypixelBlocksLength);
                 }
 
                 chunkSectionArray[i] = new CraftSlimeChunkSection(blockArray, dataArray, paletteTag, blockStatesArray, blockLightArray, skyLightArray);

@@ -66,29 +66,32 @@ public class subCommand_create extends SWMCommand {
             try {
                 long start = System.currentTimeMillis();
 
+                System.out.println("TEST 1");
+
                 WorldData worldData = new WorldData();
                 worldData.setSpawn("0, 64, 0");
 
                 SlimePropertyMap propertyMap = worldData.toPropertyMap();
+                System.out.println("TEST 2");
                 SlimeWorld slimeWorld = SWMPlugin.getInstance().createEmptyWorld(loader, worldName, false, propertyMap);
 
-                Bukkit.getScheduler().runTask(SWMPlugin.getInstance(), () -> {
-                    try {
-                        SWMPlugin.getInstance().generateWorld(slimeWorld);
+                System.out.println("TEST 3");
+                SWMPlugin.getInstance().generateWorld(slimeWorld).thenRun(() -> {
+                    System.out.println("TEST 4");
+                    // Bedrock block
+                    Location location = new Location(Bukkit.getWorld(worldName), 0, 61, 0);
+                    location.getBlock().setType(Material.BEDROCK);
 
-                        // Bedrock block
-                        Location location = new Location(Bukkit.getWorld(worldName), 0, 61, 0);
-                        location.getBlock().setType(Material.BEDROCK);
+                    // Config
+                    config.getWorlds().put(worldName, worldData);
+                    config.save();
 
-                        // Config
-                        config.getWorlds().put(worldName, worldData);
-                        config.save();
-
-                        sender.send(Logging.COMMAND_PREFIX + ChatColor.GREEN + "World " + ChatColor.YELLOW + worldName
-                                + ChatColor.GREEN + " created in " + (System.currentTimeMillis() - start) + "ms!");
-                    } catch (IllegalArgumentException ex) {
-                        sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to create world " + worldName + ": " + ex.getMessage() + ".");
-                    }
+                    System.out.println("TEST 5");
+                    sender.send(Logging.COMMAND_PREFIX + ChatColor.GREEN + "World " + ChatColor.YELLOW + worldName
+                            + ChatColor.GREEN + " created in " + (System.currentTimeMillis() - start) + "ms!");
+                }).exceptionally(ex -> {
+                    sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to create world " + worldName + ": " + ex.getMessage() + ".");
+                    return null;
                 });
             } catch (WorldAlreadyExistsException ex) {
                 sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to create world " + worldName +

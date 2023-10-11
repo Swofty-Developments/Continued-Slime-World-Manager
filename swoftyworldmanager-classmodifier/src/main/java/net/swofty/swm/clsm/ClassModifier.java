@@ -17,9 +17,6 @@ import java.util.function.BooleanSupplier;
  */
 public class ClassModifier {
 
-    // Required for Paper 1.13 as javassist can't compile this class
-    public static final BooleanSupplier BOOLEAN_SUPPLIER = () -> true;
-
     private static CLSMBridge customLoader;
 
     public static CompletableFuture getFutureChunk(Object world, int x, int z) {

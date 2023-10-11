@@ -14,6 +14,7 @@ import net.swofty.swm.api.world.properties.SlimePropertyMap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Main class of the SWM API. From here, you can load
@@ -109,7 +110,7 @@ public interface SlimePlugin {
      *
      * @param world {@link SlimeWorld} world to be added to the server's world list
      */
-    void generateWorld(SlimeWorld world);
+    CompletableFuture<Void> generateWorld(SlimeWorld world);
 
     /**
      * Migrates a {@link SlimeWorld} to another datasource.

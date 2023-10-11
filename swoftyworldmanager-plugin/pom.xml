@@ -49,7 +49,7 @@
         <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
-            <version>1.4.1-1</version>
+            <version>1.5.5-6</version>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -118,10 +118,6 @@
                         <relocation>
                             <pattern>org.bson</pattern>
                             <shadedPattern>net.swofty.swm.internal.org.bson</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>com.github.luben.zstd</pattern>
-                            <shadedPattern>net.swofty.swm.internal.zstd</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

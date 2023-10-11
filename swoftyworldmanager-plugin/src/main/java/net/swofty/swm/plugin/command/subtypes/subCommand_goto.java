@@ -40,7 +40,7 @@ public class subCommand_goto extends SWMCommand {
                 return;
             }
 
-            target = (Player) sender;
+            target = sender.getPlayer();
         }
 
         if (target == null) {

@@ -9,8 +9,7 @@ import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.properties.SlimeProperties;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
 import net.swofty.swm.nms.CraftSlimeWorld;
-import net.swofty.swm.nms.SlimeNMS;
-import net.swofty.swm.nms.v1_8_R3.v1_8_R3SlimeNMS;
+import net.swofty.swm.nms.v1_8_R3.SlimeNMS;
 import net.swofty.swm.plugin.command.CommandLoader;
 import net.swofty.swm.plugin.command.SWMCommand;
 import net.swofty.swm.plugin.loaders.LoaderUtils;
@@ -30,6 +29,7 @@ import org.reflections.Reflections;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -150,7 +150,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
     }
 
     private SlimeNMS getNMSBridge() throws InvalidVersionException {
-        return new v1_8_R3SlimeNMS();
+        return new SlimeNMS();
     }
 
     private List<String> loadWorlds() {
@@ -261,7 +261,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
                 new CompoundMap()), new ArrayList<>(), propertyMap, readOnly, !readOnly);
         loader.saveWorld(worldName, world.serialize(), !readOnly);
 
-        Logging.info("World " + worldName + " created in " + (System.currentTimeMillis() - start) + "ms.");
+        Logging.info("World " + worldName + " created (in-memory) in " + (System.currentTimeMillis() - start) + "ms.");
 
         return world;
     }
@@ -282,20 +282,28 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
     }
 
     @Override
-    public void generateWorld(SlimeWorld world) {
+    public CompletableFuture<Void> generateWorld(SlimeWorld world) {
         Objects.requireNonNull(world, "SlimeWorld cannot be null");
 
         if (!world.isReadOnly() && !world.isLocked()) {
             throw new IllegalArgumentException("This world cannot be loaded, as it has not been locked.");
         }
 
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
         /*
         Async World Generation
          */
         worldGeneratorService.submit(() -> {
             Object nmsWorld = nms.createNMSWorld(world);
-            Bukkit.getScheduler().runTask(this, () -> nms.addWorldToServerList(nmsWorld));
+            System.out.println("TEST 6");
+            Bukkit.getScheduler().runTask(this, () -> {
+                nms.addWorldToServerList(nmsWorld);
+                future.complete(null);
+            });
         });
+
+        return future;
     }
 
     @Override
