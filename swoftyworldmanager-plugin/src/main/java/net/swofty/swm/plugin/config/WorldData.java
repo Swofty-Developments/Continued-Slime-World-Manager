@@ -78,16 +78,17 @@ public class WorldData {
 
         SlimePropertyMap propertyMap = new SlimePropertyMap();
 
-        propertyMap.setInt(SlimeProperties.SPAWN_X, (int) spawnX);
-        propertyMap.setInt(SlimeProperties.SPAWN_Y, (int) spawnY);
-        propertyMap.setInt(SlimeProperties.SPAWN_Z, (int) spawnZ);
+        propertyMap.setValue(SlimeProperties.SPAWN_X, (int) spawnX);
+        propertyMap.setValue(SlimeProperties.SPAWN_Y, (int) spawnY);
+        propertyMap.setValue(SlimeProperties.SPAWN_Z, (int) spawnZ);
 
-        propertyMap.setString(SlimeProperties.DIFFICULTY, difficulty);
-        propertyMap.setBoolean(SlimeProperties.ALLOW_MONSTERS, allowMonsters);
-        propertyMap.setBoolean(SlimeProperties.ALLOW_ANIMALS, allowAnimals);
-        propertyMap.setBoolean(SlimeProperties.PVP, pvp);
-        propertyMap.setString(SlimeProperties.ENVIRONMENT, environment);
-        propertyMap.setString(SlimeProperties.WORLD_TYPE, worldType);
+        propertyMap.setValue(SlimeProperties.DIFFICULTY, difficulty);
+        propertyMap.setValue(SlimeProperties.ALLOW_MONSTERS, allowMonsters);
+        propertyMap.setValue(SlimeProperties.ALLOW_ANIMALS, allowAnimals);
+        propertyMap.setValue(SlimeProperties.PVP, pvp);
+        propertyMap.setValue(SlimeProperties.ENVIRONMENT, environment);
+        propertyMap.setValue(SlimeProperties.WORLD_TYPE, worldType);
+        propertyMap.setValue(SlimeProperties.LOAD_ON_STARTUP, loadOnStartup);
 
         return propertyMap;
     }

@@ -344,17 +344,6 @@ public class SWMImporter {
                 return false;
             }
         }
-
-        return true;
-    }
-
-    private static boolean isEmpty(long[] array) {
-        for (long b : array) {
-            if (b != 0L) {
-                return false;
-            }
-        }
-
         return true;
     }
 

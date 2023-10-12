@@ -72,4 +72,10 @@ public class SlimeProperties {
      * The default biome generated in empty chunks
      */
     public static final SlimeProperty<String> DEFAULT_BIOME = new SlimePropertyString("defaultBiome", "minecraft:plains");
+
+
+    /**
+     * The default biome generated in empty chunks
+     */
+    public static final SlimeProperty<Boolean> LOAD_ON_STARTUP = new SlimePropertyBoolean("loadOnStartup", true);
 }

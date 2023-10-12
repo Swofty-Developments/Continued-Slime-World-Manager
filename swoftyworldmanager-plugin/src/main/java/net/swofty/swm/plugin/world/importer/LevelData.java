@@ -9,7 +9,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LevelData {
 
-    private final int version; // Unused
     private final Map<String, String> gameRules;
 
     private final int spawnX;

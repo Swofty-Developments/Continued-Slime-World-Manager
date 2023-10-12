@@ -129,7 +129,7 @@ public class WorldImporter {
                 int spawnY = dataTag.get().getIntValue("SpawnY").orElse(255);
                 int spawnZ = dataTag.get().getIntValue("SpawnZ").orElse(0);
 
-                return new LevelData(dataVersion, gameRules, spawnX, spawnY, spawnZ);
+                return new LevelData(gameRules, spawnX, spawnY, spawnZ);
             }
         }
 
