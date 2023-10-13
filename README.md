@@ -1,4 +1,4 @@
-![](https://media.discordapp.net/attachments/1122145806066126899/1162312766242160640/image.png?ex=653b7b1e&is=6529061e&hm=6c630e058e6e87db38018d5ce3ac93bff925089561c036b34983cbb47260b30d&=&width=1198&height=675)
+![](https://cdn.discordapp.com/attachments/1122145806066126899/1162312766242160640/image.png?ex=653b7b1e&is=6529061e&hm=6c630e058e6e87db38018d5ce3ac93bff925089561c036b34983cbb47260b30d&)
 # Continued Slime World Manager
 
 [<img src="https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg" alt="" height="55" />](https://discord.gg/atlasmc)
