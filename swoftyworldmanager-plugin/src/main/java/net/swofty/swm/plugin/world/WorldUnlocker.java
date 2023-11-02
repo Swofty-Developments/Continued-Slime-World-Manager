@@ -31,8 +31,6 @@ public class WorldUnlocker implements Listener {
             ex.printStackTrace();
 
             Bukkit.getScheduler().runTaskLaterAsynchronously(SWMPlugin.getInstance(), () -> unlockWorld(world), 100);
-        } catch (UnknownWorldException ignored) {
-
-        }
+        } catch (UnknownWorldException ignored) {}
     }
 }

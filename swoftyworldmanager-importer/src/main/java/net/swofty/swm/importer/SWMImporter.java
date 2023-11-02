@@ -10,8 +10,8 @@ import net.swofty.swm.api.utils.NibbleArray;
 import net.swofty.swm.api.utils.SlimeFormat;
 import net.swofty.swm.api.world.SlimeChunk;
 import net.swofty.swm.api.world.SlimeChunkSection;
-import net.swofty.swm.nms.CraftSlimeChunk;
-import net.swofty.swm.nms.CraftSlimeChunkSection;
+import net.swofty.swm.nms.craft.CraftSlimeChunk;
+import net.swofty.swm.nms.craft.CraftSlimeChunkSection;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

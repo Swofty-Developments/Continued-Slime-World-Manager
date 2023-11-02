@@ -6,28 +6,37 @@
         <version>3.0.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>net.swofty</groupId>
-    <artifactId>swoftyworldmanager-api</artifactId>
-    <packaging>jar</packaging>
-
     <properties>
-        <java.version>1.8</java.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.1.1</version>
-                <configuration>
-                    <reportOutputDirectory>../docs/</reportOutputDirectory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <artifactId>swoftyworldmanager-nms</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>net.swofty</groupId>
+            <artifactId>swoftyworldmanager-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.luben</groupId>
+            <artifactId>zstd-jni</artifactId>
+            <version>1.4.1-1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.swofty</groupId>
+            <artifactId>swoftyworldmanager-classmodifier</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>

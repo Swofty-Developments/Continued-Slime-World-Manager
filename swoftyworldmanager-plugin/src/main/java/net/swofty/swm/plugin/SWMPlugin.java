@@ -8,11 +8,11 @@ import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.properties.SlimeProperties;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
-import net.swofty.swm.nms.CraftSlimeWorld;
-import net.swofty.swm.nms.v1_8_R3.SlimeNMS;
-import net.swofty.swm.plugin.command.CommandLoader;
-import net.swofty.swm.plugin.command.SWMCommand;
-import net.swofty.swm.plugin.loaders.LoaderUtils;
+import net.swofty.swm.nms.craft.CraftSlimeWorld;
+import net.swofty.swm.nms.SlimeNMS;
+import net.swofty.swm.plugin.commands.CommandLoader;
+import net.swofty.swm.plugin.commands.SWMCommand;
+import net.swofty.swm.plugin.loader.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
 import net.swofty.swm.plugin.world.WorldUnlocker;
 import net.swofty.swm.plugin.world.importer.WorldImporter;
@@ -89,7 +89,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
         cl = new CommandLoader();
         SWMCommand.register();
 
-        Reflections reflection = new Reflections("net.swofty.swm.plugin.command.subtypes");
+        Reflections reflection = new Reflections("net.swofty.swm.plugin.commands.subtypes");
         for(Class<? extends SWMCommand> l:reflection.getSubTypesOf(SWMCommand.class)) {
             try {
                 SWMCommand command = l.newInstance();

@@ -3,7 +3,7 @@
     <parent>
         <artifactId>swoftyworldmanager</artifactId>
         <groupId>net.swofty</groupId>
-        <version>3.0.2</version>
+        <version>3.0.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>swoftyworldmanager-importer</artifactId>
@@ -16,7 +16,7 @@
         </dependency>
         <dependency>
             <groupId>net.swofty</groupId>
-            <artifactId>swoftyworldmanager-nms-common</artifactId>
+            <artifactId>swoftyworldmanager-nms</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -82,5 +82,28 @@
         </plugins>
     </build>
 
-
+    <profiles>
+        <profile>
+            <id>github</id>
+            <activation>
+                <property>
+                    <name>useGitHubPackages</name>
+                    <value>true</value>
+                </property>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub OWNER Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/Swofty-Developments/Continued-Slime-World-Manager</url>
+                </repository>
+                <snapshotRepository>
+                    <id>github</id>
+                    <name>GitHub OWNER Apache Maven Packages</name>
+                    <url>https://maven.pkg.github.com/Swofty-Developments/Continued-Slime-World-Manager</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>

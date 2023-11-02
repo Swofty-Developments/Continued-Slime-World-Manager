@@ -10,36 +10,18 @@ import net.swofty.swm.api.utils.NibbleArray;
 public interface SlimeChunkSection {
 
     /**
-     * Returns all the blocks of the chunk section, or <code>null</code>
-     * in case it's a post 1.13 world.
+     * Returns all the blocks of the chunk section
      *
      * @return A <code>byte[]</code> with all the blocks of a chunk section.
      */
     byte[] getBlocks();
 
     /**
-     * Returns the data of all the blocks of the chunk section, or
-     * <code>null</code> if it's a post 1.13 world.
+     * Returns the data of all the blocks of the chunk section
      *
      * @return A {@link NibbleArray} containing all the blocks of a chunk section.
      */
     NibbleArray getData();
-
-    /**
-     * Returns the block palette of the chunk section, or
-     * <code>null</code> if it's a pre 1.13 world.
-     *
-     * @return The block palette, contained inside a {@link ListTag}
-     */
-    ListTag<CompoundTag> getPalette();
-
-    /**
-     * Returns all the states of the blocks of the chunk section, or
-     * <code>null</code> in case it's a pre 1.13 world.
-     *
-     * @return A <code>long[]</code> with every block state.
-     */
-    long[] getBlockStates();
 
     /**
      * Returns the block light data.

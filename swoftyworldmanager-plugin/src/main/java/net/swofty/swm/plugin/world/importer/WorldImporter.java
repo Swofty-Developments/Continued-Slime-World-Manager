@@ -10,9 +10,9 @@ import net.swofty.swm.api.world.properties.SlimeProperties;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.swofty.swm.nms.CraftSlimeChunk;
-import net.swofty.swm.nms.CraftSlimeChunkSection;
-import net.swofty.swm.nms.CraftSlimeWorld;
+import net.swofty.swm.nms.craft.CraftSlimeChunk;
+import net.swofty.swm.nms.craft.CraftSlimeChunkSection;
+import net.swofty.swm.nms.craft.CraftSlimeWorld;
 
 import java.io.*;
 import java.nio.ByteBuffer;
