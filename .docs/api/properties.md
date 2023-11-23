@@ -8,10 +8,10 @@ Property "types" are handled by [SlimeProperty][1] instances. Whilst not allowin
 // Create a new and empty property map
 SlimePropertyMap properties = new SlimePropertyMap();
 
-properties.setString(SlimeProperties.DIFFICULTY, "normal");
-properties.setInt(SlimeProperties.SPAWN_X, 123);
-properties.setInt(SlimeProperties.SPAWN_Y, 112);
-properties.setInt(SlimeProperties.SPAWN_Z, 170);
+properties.setValue(SlimeProperties.DIFFICULTY, "normal");
+properties.setValue(SlimeProperties.SPAWN_X, 123);
+properties.setValue(SlimeProperties.SPAWN_Y, 112);
+properties.setValue(SlimeProperties.SPAWN_Z, 170);
 /* Add as many as you like */
 ```
 
