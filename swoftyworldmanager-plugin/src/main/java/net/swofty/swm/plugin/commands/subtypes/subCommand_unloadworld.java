@@ -1,10 +1,17 @@
 package net.swofty.swm.plugin.commands.subtypes;
 
 import lombok.SneakyThrows;
+import net.swofty.swm.api.loaders.SlimeLoader;
+import net.swofty.swm.api.world.SlimeWorld;
+import net.swofty.swm.plugin.SWMPlugin;
 import net.swofty.swm.plugin.commands.CommandCooldown;
 import net.swofty.swm.plugin.commands.CommandParameters;
 import net.swofty.swm.plugin.commands.CommandSource;
 import net.swofty.swm.plugin.commands.SWMCommand;
+import net.swofty.swm.plugin.config.ConfigManager;
+import net.swofty.swm.plugin.config.WorldData;
+import net.swofty.swm.plugin.config.WorldsConfig;
+import net.swofty.swm.plugin.loader.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
@@ -26,34 +33,16 @@ public class subCommand_unloadworld extends SWMCommand implements CommandCooldow
             return;
         }
 
-        World world = Bukkit.getWorld(args[0]);
+        WorldsConfig config = ConfigManager.getWorldConfig();
+        WorldData worldData = config.getWorlds().get(args[0]);
 
-        if (world == null) {
-            sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "World " + args[0] + " is not loaded!");
+        if (worldData == null || Bukkit.getWorld(args[0]) == null) {
+            sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Unknown slime world " + args[0] + "! Are you sure you've typed it correctly?");
             return;
         }
 
-        // Teleport all players outside the world before unloading it
-        List<Player> players = world.getPlayers();
-
-        if (!players.isEmpty()) {
-            World defaultWorld = Bukkit.getWorlds().get(0);
-            Location spawnLocation = defaultWorld.getSpawnLocation();
-
-            while (spawnLocation.getBlock().getType() != Material.AIR || spawnLocation.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
-                spawnLocation.add(0, 1, 0);
-            }
-
-            for (Player player : players) {
-                player.teleport(spawnLocation);
-            }
-        }
-
-        if (Bukkit.unloadWorld(world, true)) {
-            sender.send(Logging.COMMAND_PREFIX + ChatColor.GREEN + "World " + ChatColor.YELLOW + args[0] + ChatColor.GREEN + " unloaded correctly.");
-        } else {
-            sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to unload world " + args[0] + ".");
-        }
+        SlimeWorld world = SWMPlugin.getInstance().getNms().getSlimeWorld(Bukkit.getWorld(args[0]));
+        world.unloadWorld(true);
     }
 
     @Override

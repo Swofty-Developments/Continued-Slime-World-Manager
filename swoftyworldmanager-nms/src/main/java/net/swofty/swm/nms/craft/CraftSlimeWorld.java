@@ -10,6 +10,7 @@ import com.github.luben.zstd.Zstd;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import net.swofty.swm.api.exceptions.UnknownWorldException;
 import net.swofty.swm.api.exceptions.WorldAlreadyExistsException;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.utils.SlimeFormat;
@@ -17,7 +18,9 @@ import net.swofty.swm.api.world.SlimeChunk;
 import net.swofty.swm.api.world.SlimeChunkSection;
 import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
-import org.bukkit.Difficulty;
+import org.bukkit.*;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -51,6 +54,42 @@ public class CraftSlimeWorld implements SlimeWorld {
             Long index = (((long) z) * Integer.MAX_VALUE + ((long) x));
 
             return chunks.get(index);
+        }
+    }
+
+    @Override
+    public void unloadWorld(boolean save, String fallBack) {
+        World world = Bukkit.getWorld(name);
+
+        // Teleport all players outside the world before unloading it
+        List<Player> players = world.getPlayers();
+
+        if (!players.isEmpty()) {
+            World fallbackWorld = null;
+            if (fallBack != null) {
+                fallbackWorld = Bukkit.getWorld(fallBack);
+            } else {
+                fallbackWorld = Bukkit.getWorlds().get(0);
+            }
+            Location spawnLocation = fallbackWorld.getSpawnLocation();
+
+            while (spawnLocation.getBlock().getType() != Material.AIR || spawnLocation.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
+                spawnLocation.add(0, 1, 0);
+            }
+
+            for (Player player : players) {
+                player.teleport(spawnLocation);
+            }
+        }
+
+        if (!Bukkit.unloadWorld(world, save)) {
+            throw new IllegalStateException("Failed to unload world " + name + ".");
+        } else {
+            try {
+                loader.unlockWorld(name);
+            } catch (UnknownWorldException | IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

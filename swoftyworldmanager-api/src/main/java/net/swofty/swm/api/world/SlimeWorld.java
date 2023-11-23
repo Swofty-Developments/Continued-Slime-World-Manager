@@ -63,6 +63,23 @@ public interface SlimeWorld {
     Collection<CompoundTag> getWorldMaps();
 
     /**
+     * Standardized method to Bukkit unload.
+     *
+     * @param save Whether or not to save the world
+     * @param fallBack String name of the world to fall players back to
+     */
+    void unloadWorld(boolean save, String fallBack);
+
+    /**
+     * Standardized method to Bukkit unload.
+     *
+     * @param save Whether or not to save the world
+     */
+    default void unloadWorld(boolean save) {
+        unloadWorld(save, null);
+    }
+
+    /**
      * Returns the properties of the world. These properties are automatically
      * kept up-to-date when the world is loaded and its properties are updated.
      *

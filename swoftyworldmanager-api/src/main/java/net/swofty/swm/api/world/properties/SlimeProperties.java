@@ -43,11 +43,6 @@ public class SlimeProperties {
     public static final SlimeProperty<Boolean> ALLOW_ANIMALS = new SlimePropertyBoolean("allowAnimals", true);
 
     /**
-     * Whether the dragon battle should be enabled in end worlds
-     */
-    public static final SlimeProperty<Boolean> DRAGON_BATTLE = new SlimePropertyBoolean("dragonBattle", false);
-
-    /**
      * Whether PVP combat is allowed
      */
     public static final SlimeProperty<Boolean> PVP = new SlimePropertyBoolean("pvp", true);
@@ -67,12 +62,6 @@ public class SlimeProperties {
                     || value.equalsIgnoreCase("amplified") || value.equalsIgnoreCase("customized")
                     || value.equalsIgnoreCase("debug_all_block_states") || value.equalsIgnoreCase("default_1_1")
     );
-
-    /**
-     * The default biome generated in empty chunks
-     */
-    public static final SlimeProperty<String> DEFAULT_BIOME = new SlimePropertyString("defaultBiome", "minecraft:plains");
-
 
     /**
      * The default biome generated in empty chunks
