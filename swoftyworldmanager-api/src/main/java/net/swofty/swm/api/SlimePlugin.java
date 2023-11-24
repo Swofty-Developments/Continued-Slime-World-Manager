@@ -10,6 +10,7 @@ import net.swofty.swm.api.exceptions.WorldLoadedException;
 import net.swofty.swm.api.exceptions.WorldTooBigException;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.world.SlimeWorld;
+import net.swofty.swm.api.world.data.ConfigManager;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
 
 import java.io.File;
@@ -26,6 +27,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * interface, to load and store worlds from other data sources.
  */
 public interface SlimePlugin {
+
+    /**
+     * Returns the {@link ConfigManager} of the plugin.
+     * This can be used to retrieve the {@link net.swofty.swm.api.world.data.WorldsConfig}
+     * objects.
+     *
+     * @return The {@link ConfigManager} of the plugin.
+     */
+    ConfigManager getConfigManager();
 
     /**
      * Loads a world using a specificied {@link SlimeLoader}.

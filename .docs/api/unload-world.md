@@ -1,3 +1,5 @@
+## Unloading a world
+
 Given that you have your SlimeWorld object, you can unload it using the following method:
 ```java
 slimeworld.unloadWorld(true);

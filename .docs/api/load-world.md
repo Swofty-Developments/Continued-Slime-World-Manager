@@ -1,3 +1,5 @@
+## Loading a world
+
 First, retrieve the SwoftyWorldManager plugin API:
 ```java
 SlimePlugin plugin = (SlimePlugin) Bukkit.getPluginManager().getPlugin("SwoftyWorldManager");

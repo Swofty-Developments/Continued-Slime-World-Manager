@@ -48,7 +48,7 @@ public class subCommand_loadtemplate extends SWMCommand implements CommandCooldo
 
         String templateWorldName = args[0];
 
-        WorldsConfig config = new ConfigManager().getWorldConfig();
+        WorldsConfig config = SWMPlugin.getInstance().getConfigManager().getWorldConfig();
         WorldData worldData = config.getWorlds().get(templateWorldName);
 
         if (worldData == null) {

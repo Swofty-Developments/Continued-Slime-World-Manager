@@ -57,7 +57,7 @@ public class subCommand_list extends SWMCommand {
 
         List<String> worldsList = new ArrayList<>(slimeWorlds.keySet());
         worldsList.addAll(bukkitWorlds.stream().map(World::getName).collect(Collectors.toList()));
-        new ConfigManager().getWorldConfig().getWorlds().keySet().stream().filter((world) -> !worldsList.contains(world)).forEach(worldsList::add);
+        SWMPlugin.getInstance().getConfigManager().getWorldConfig().getWorlds().keySet().stream().filter((world) -> !worldsList.contains(world)).forEach(worldsList::add);
 
         if (worldsList.isEmpty()) {
             sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "There are no worlds configured.");

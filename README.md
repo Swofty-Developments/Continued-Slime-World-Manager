@@ -53,6 +53,7 @@ Javadocs can be found [here](https://swofty-developments.github.io/Continued-Sli
    * [Migrating a world](.docs/api/migrate-world.md)
    * [Importing a world](.docs/api/import-world.md)
    * [Unload a world](.docs/api/unload-world.md)
+   * [Events](.docs/api/events.md)
    * [Using other data sources](.docs/api/use-data-source.md)
 * [FAQ](.docs/faq.md)
 

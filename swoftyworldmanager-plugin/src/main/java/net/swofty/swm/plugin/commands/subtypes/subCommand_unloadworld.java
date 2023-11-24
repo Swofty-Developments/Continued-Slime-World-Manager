@@ -29,7 +29,7 @@ public class subCommand_unloadworld extends SWMCommand implements CommandCooldow
             return;
         }
 
-        WorldsConfig config = new ConfigManager().getWorldConfig();
+        WorldsConfig config = SWMPlugin.getInstance().getConfigManager().getWorldConfig();
         WorldData worldData = config.getWorlds().get(args[0]);
 
         if (worldData == null || Bukkit.getWorld(args[0]) == null) {

@@ -3,6 +3,8 @@ package net.swofty.swm.plugin;
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
 import net.swofty.swm.api.SlimePlugin;
+import net.swofty.swm.api.events.PostGenerateWorldEvent;
+import net.swofty.swm.api.events.PreGenerateWorldEvent;
 import net.swofty.swm.api.exceptions.*;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.world.SlimeWorld;
@@ -22,6 +24,7 @@ import net.swofty.swm.plugin.config.ConfigManager;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bukkit.*;
 import org.bukkit.command.CommandMap;
+import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 
@@ -166,7 +169,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
 
     private List<String> loadWorlds() {
         List<String> erroredWorlds = new ArrayList<>();
-        WorldsConfig config = new ConfigManager().getWorldConfig();
+        WorldsConfig config = getConfigManager().getWorldConfig();
 
         for (Map.Entry<String, WorldData> entry : config.getWorlds().entrySet()) {
             String worldName = entry.getKey();
@@ -213,6 +216,11 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
 
         config.save();
         return erroredWorlds;
+    }
+
+    @Override
+    public net.swofty.swm.api.world.data.ConfigManager getConfigManager() {
+        return new ConfigManager();
     }
 
     @Override
@@ -265,6 +273,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
 
     @Override
     public CompletableFuture<Void> generateWorld(SlimeWorld world) {
+        Bukkit.getPluginManager().callEvent(new PreGenerateWorldEvent(world));
         Objects.requireNonNull(world, "SlimeWorld cannot be null");
 
         if (!world.isReadOnly() && !world.isLocked()) {
@@ -280,6 +289,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
             Object nmsWorld = nms.createNMSWorld(world);
             Bukkit.getScheduler().runTask(this, () -> {
                 nms.addWorldToServerList(nmsWorld);
+                Bukkit.getPluginManager().callEvent(new PostGenerateWorldEvent(world));
                 future.complete(null);
             });
         });

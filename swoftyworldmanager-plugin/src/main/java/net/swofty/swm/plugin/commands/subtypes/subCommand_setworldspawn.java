@@ -25,7 +25,7 @@ public class subCommand_setworldspawn extends SWMCommand implements CommandCoold
     @Override
     public void run(CommandSource sender, String[] args) {
         World world = sender.getPlayer().getWorld();
-        WorldsConfig config = new ConfigManager().getWorldConfig();
+        WorldsConfig config = SWMPlugin.getInstance().getConfigManager().getWorldConfig();
         WorldData worldData = config.getWorlds().get(world.getName());
 
         if (worldData == null) {

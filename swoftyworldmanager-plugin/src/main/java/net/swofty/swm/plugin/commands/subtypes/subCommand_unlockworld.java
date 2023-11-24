@@ -29,7 +29,7 @@ public class subCommand_unlockworld extends SWMCommand implements CommandCooldow
             return;
         }
 
-        WorldsConfig config = new ConfigManager().getWorldConfig();
+        WorldsConfig config = SWMPlugin.getInstance().getConfigManager().getWorldConfig();
         WorldData worldData = config.getWorlds().get(args[0]);
 
         if (worldData == null) {

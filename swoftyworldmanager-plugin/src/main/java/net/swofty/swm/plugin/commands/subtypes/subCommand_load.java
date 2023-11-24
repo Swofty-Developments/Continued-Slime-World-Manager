@@ -49,7 +49,7 @@ public class subCommand_load extends SWMCommand implements CommandCooldown {
             return;
         }
 
-        WorldsConfig config = new ConfigManager().getWorldConfig();
+        WorldsConfig config = SWMPlugin.getInstance().getConfigManager().getWorldConfig();
         WorldData worldData = config.getWorlds().get(worldName);
 
         if (worldData == null) {

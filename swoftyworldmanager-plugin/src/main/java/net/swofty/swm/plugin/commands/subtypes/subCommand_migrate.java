@@ -40,7 +40,7 @@ public class subCommand_migrate extends SWMCommand implements CommandCooldown {
         }
 
         String worldName = args[0];
-        WorldsConfig config = new ConfigManager().getWorldConfig();
+        WorldsConfig config = SWMPlugin.getInstance().getConfigManager().getWorldConfig();
         WorldData worldData = config.getWorlds().get(worldName);
 
         if (worldData == null) {
