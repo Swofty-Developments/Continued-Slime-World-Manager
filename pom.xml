@@ -5,7 +5,7 @@
     <groupId>net.swofty</groupId>
     <artifactId>swoftyworldmanager</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.6</version>
+    <version>3.1.0</version>
     <modules>
         <module>swoftyworldmanager-api</module>
         <module>swoftyworldmanager-nms</module>

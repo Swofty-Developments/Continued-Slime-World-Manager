@@ -3,13 +3,13 @@ package net.swofty.swm.plugin.commands.subtypes;
 import net.swofty.swm.api.exceptions.*;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.world.SlimeWorld;
+import net.swofty.swm.api.world.data.WorldData;
+import net.swofty.swm.api.world.data.WorldsConfig;
 import net.swofty.swm.plugin.SWMPlugin;
 import net.swofty.swm.plugin.commands.CommandParameters;
 import net.swofty.swm.plugin.commands.CommandSource;
 import net.swofty.swm.plugin.commands.SWMCommand;
 import net.swofty.swm.plugin.config.ConfigManager;
-import net.swofty.swm.plugin.config.WorldData;
-import net.swofty.swm.plugin.config.WorldsConfig;
 import net.swofty.swm.plugin.loader.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
 import org.bukkit.Bukkit;
@@ -42,7 +42,7 @@ public class subCommand_clone extends SWMCommand {
 
         String templateWorldName = args[0];
 
-        WorldsConfig config = ConfigManager.getWorldConfig();
+        WorldsConfig config = new ConfigManager().getWorldConfig();
         WorldData worldData = config.getWorlds().get(templateWorldName);
 
         if (worldData == null) {

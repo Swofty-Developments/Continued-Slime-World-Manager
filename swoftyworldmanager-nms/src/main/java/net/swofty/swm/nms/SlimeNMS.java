@@ -81,9 +81,6 @@ public class SlimeNMS {
             throw new IllegalArgumentException("World " + worldName + " already exists! Maybe it's an outdated SlimeWorld object?");
         }
 
-        LOGGER.info("Loading world " + worldName);
-        long startTime = System.currentTimeMillis();
-
         server.setReady(true);
         MinecraftServer mcServer = MinecraftServer.getServer();
 
@@ -93,7 +90,7 @@ public class SlimeNMS {
         Bukkit.getPluginManager().callEvent(new WorldInitEvent(server.getWorld()));
         Bukkit.getPluginManager().callEvent(new WorldLoadEvent(server.getWorld()));
 
-        LOGGER.info("World " + worldName + " loaded in " + (System.currentTimeMillis() - startTime) + "ms.");
+        LOGGER.info("World " + worldName + " loaded.");
     }
 
     public SlimeWorld getSlimeWorld(World world) {

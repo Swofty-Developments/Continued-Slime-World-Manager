@@ -3,7 +3,7 @@
     <parent>
         <artifactId>swoftyworldmanager</artifactId>
         <groupId>net.swofty</groupId>
-        <version>3.0.6</version>
+        <version>3.1.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,6 +15,14 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-yaml</artifactId>
+            <version>3.7-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

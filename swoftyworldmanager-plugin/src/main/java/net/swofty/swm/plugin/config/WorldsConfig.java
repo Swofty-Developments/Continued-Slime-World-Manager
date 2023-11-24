@@ -11,13 +11,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-@Getter
 @ConfigSerializable
-public class WorldsConfig {
+public class WorldsConfig implements net.swofty.swm.api.world.data.WorldsConfig {
 
     @Setting("worlds")
-    private Map<String, WorldData> worlds = new HashMap<>();
+    private Map<String, net.swofty.swm.api.world.data.WorldData> worlds = new HashMap<>();
 
+    @Override
     public void save() {
         try {
             ConfigManager.getWorldConfigLoader().save(ConfigManager.getWorldConfigLoader().createEmptyNode().setValue(TypeToken.of(WorldsConfig.class), this));
@@ -25,5 +25,10 @@ public class WorldsConfig {
             Logging.error("Failed to save worlds config file:");
             ex.printStackTrace();
         }
+    }
+
+    @Override
+    public Map<String, net.swofty.swm.api.world.data.WorldData> getWorlds() {
+        return worlds;
     }
 }

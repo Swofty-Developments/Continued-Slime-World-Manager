@@ -14,7 +14,10 @@ import net.swofty.swm.api.world.properties.SlimePropertyMap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Main class of the SWM API. From here, you can load
@@ -23,29 +26,6 @@ import java.util.concurrent.CompletableFuture;
  * interface, to load and store worlds from other data sources.
  */
 public interface SlimePlugin {
-
-    /**
-     * Loads a world using a specificied {@link SlimeLoader}.
-     * This world can then be added to the server's world
-     * list by using the {@link #generateWorld(SlimeWorld)} method.
-     *
-     * @param loader {@link SlimeLoader} used to retrieve the world.
-     * @param worldName Name of the world.
-     * @param properties Properties of the world contained within a {@link SlimeWorld.SlimeProperties} object.
-     *
-     * @return A {@link SlimeWorld}, which is the in-memory representation of the world.
-     *
-     * @throws UnknownWorldException if the world cannot be found.
-     * @throws IOException if the world cannot be obtained from the speficied data source.
-     * @throws CorruptedWorldException if the world retrieved cannot be parsed into a {@link SlimeWorld} object.
-     * @throws NewerFormatException if the world uses a newer version of the SRF.
-     * @throws WorldInUseException if the world is already being used on another server when trying to open it without read-only mode enabled.
-     *
-     * @deprecated see {@link #loadWorld(SlimeLoader, String, boolean, SlimePropertyMap)}
-     */
-    @Deprecated
-    SlimeWorld loadWorld(SlimeLoader loader, String worldName, SlimeWorld.SlimeProperties properties) throws
-            UnknownWorldException, IOException, CorruptedWorldException, NewerFormatException, WorldInUseException;
 
     /**
      * Loads a world using a specificied {@link SlimeLoader}.
@@ -67,25 +47,6 @@ public interface SlimePlugin {
      */
     SlimeWorld loadWorld(SlimeLoader loader, String worldName, boolean readOnly, SlimePropertyMap propertyMap) throws
             UnknownWorldException, IOException, CorruptedWorldException, NewerFormatException, WorldInUseException;
-
-    /**
-     * Creates an empty world and stores it using a specified
-     * {@link SlimeLoader}. This world can then be added to
-     * the server's world list by using the {@link #generateWorld(SlimeWorld)} method.
-     *
-     * @param loader {@link SlimeLoader} used to store the world.
-     * @param worldName Name of the world.
-     * @param properties Properties of the world contained within a {@link SlimeWorld.SlimeProperties} object.
-     *
-     * @return A {@link SlimeWorld}, which is the in-memory representation of the world.
-     *
-     * @throws WorldAlreadyExistsException if the provided data source already contains a world with the same name.
-     * @throws IOException if the world could not be stored.
-     *
-     * @deprecated see {@link #createEmptyWorld(SlimeLoader, String, boolean, SlimePropertyMap)}
-     */
-    @Deprecated
-    SlimeWorld createEmptyWorld(SlimeLoader loader, String worldName, SlimeWorld.SlimeProperties properties) throws WorldAlreadyExistsException, IOException;
 
     /**
      * Creates an empty world and stores it using a specified
@@ -160,4 +121,6 @@ public interface SlimePlugin {
      */
     void importWorld(File worldDir, String worldName, SlimeLoader loader) throws WorldAlreadyExistsException,
             InvalidWorldException, WorldLoadedException, WorldTooBigException, IOException;
+
+    Map<String, SlimeWorld> getSlimeWorlds();
 }

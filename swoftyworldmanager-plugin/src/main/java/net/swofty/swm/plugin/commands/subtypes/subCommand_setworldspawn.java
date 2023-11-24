@@ -1,7 +1,6 @@
 package net.swofty.swm.plugin.commands.subtypes;
 
 import lombok.SneakyThrows;
-import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.data.WorldData;
 import net.swofty.swm.api.world.data.WorldsConfig;
 import net.swofty.swm.plugin.SWMPlugin;
@@ -11,34 +10,33 @@ import net.swofty.swm.plugin.commands.CommandSource;
 import net.swofty.swm.plugin.commands.SWMCommand;
 import net.swofty.swm.plugin.config.ConfigManager;
 import net.swofty.swm.plugin.log.Logging;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-@CommandParameters(description = "Unload a world", inGameOnly = false, permission = "swm.unloadworld")
-public class subCommand_unloadworld extends SWMCommand implements CommandCooldown {
+@CommandParameters(description = "Sets a world spawn", inGameOnly = true, permission = "swm.setworldspawn")
+public class subCommand_setworldspawn extends SWMCommand implements CommandCooldown {
 
     @SneakyThrows
     @Override
     public void run(CommandSource sender, String[] args) {
-        if (args.length == 0) {
-            sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Usage: /swm unloadworld <world>");
-            return;
-        }
-
+        World world = sender.getPlayer().getWorld();
         WorldsConfig config = new ConfigManager().getWorldConfig();
-        WorldData worldData = config.getWorlds().get(args[0]);
+        WorldData worldData = config.getWorlds().get(world.getName());
 
-        if (worldData == null || Bukkit.getWorld(args[0]) == null) {
-            sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Unknown slime world " + args[0] + "! Are you sure you've typed it correctly?");
+        if (worldData == null) {
+            sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "You are not currently in a slime world!");
             return;
         }
 
-        SlimeWorld world = SWMPlugin.getInstance().getNms().getSlimeWorld(Bukkit.getWorld(args[0]));
-        world.unloadWorld(true);
+        worldData.setSpawn(sender.getPlayer().getLocation().getBlockX() + ", " + sender.getPlayer().getLocation().getBlockY() + ", " + sender.getPlayer().getLocation().getBlockZ());
+        config.save();
+
+        sender.send(Logging.COMMAND_PREFIX + ChatColor.GREEN + "Set world spawn for world " + world.getName() + " to " + sender.getPlayer().getLocation().getBlockX() + ", " + sender.getPlayer().getLocation().getBlockY() + ", " + sender.getPlayer().getLocation().getBlockZ() + "!");
     }
 
     @Override

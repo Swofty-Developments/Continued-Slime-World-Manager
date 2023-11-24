@@ -1,6 +1,7 @@
 package net.swofty.swm.plugin.config;
 
 import com.google.common.reflect.TypeToken;
+import net.swofty.swm.api.world.data.WorldsConfig;
 import net.swofty.swm.plugin.SWMPlugin;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class ConfigManager {
+public class ConfigManager implements net.swofty.swm.api.world.data.ConfigManager {
 
     private static final File PLUGIN_DIR = new File("plugins", "SwoftyWorldManager");
     private static final File MAIN_FILE = new File(PLUGIN_DIR, "main.yml");
@@ -25,8 +26,7 @@ public class ConfigManager {
     @Getter(value = AccessLevel.PACKAGE)
     private static YAMLConfigurationLoader mainConfigLoader;
 
-    @Getter
-    private static WorldsConfig worldConfig;
+    private static net.swofty.swm.plugin.config.WorldsConfig worldConfig;
     @Getter(value = AccessLevel.PACKAGE)
     private static YAMLConfigurationLoader worldConfigLoader;
 
@@ -42,7 +42,7 @@ public class ConfigManager {
 
         worldConfigLoader = YAMLConfigurationLoader.builder().setPath(WORLDS_FILE.toPath())
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).setHeaderMode(HeaderMode.PRESERVE).build();
-        worldConfig = worldConfigLoader.load().getValue(TypeToken.of(WorldsConfig.class));
+        worldConfig = worldConfigLoader.load().getValue(TypeToken.of(net.swofty.swm.plugin.config.WorldsConfig.class));
 
         YAMLConfigurationLoader datasourcesConfigLoader = YAMLConfigurationLoader.builder().setPath(SOURCES_FILE.toPath())
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).setHeaderMode(HeaderMode.PRESERVE).build();
@@ -67,5 +67,9 @@ public class ConfigManager {
         if (!SOURCES_FILE.exists()) {
             Files.copy(SWMPlugin.getInstance().getResource("worlds.yml"), SOURCES_FILE.toPath());
         }
+    }
+
+    public WorldsConfig getWorldConfig() {
+        return worldConfig;
     }
 }

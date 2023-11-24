@@ -4,13 +4,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.swofty.swm.api.exceptions.UnknownWorldException;
 import net.swofty.swm.api.loaders.SlimeLoader;
+import net.swofty.swm.api.world.data.WorldData;
+import net.swofty.swm.api.world.data.WorldsConfig;
 import net.swofty.swm.plugin.SWMPlugin;
 import net.swofty.swm.plugin.commands.CommandParameters;
 import net.swofty.swm.plugin.commands.CommandSource;
 import net.swofty.swm.plugin.commands.SWMCommand;
 import net.swofty.swm.plugin.config.ConfigManager;
-import net.swofty.swm.plugin.config.WorldData;
-import net.swofty.swm.plugin.config.WorldsConfig;
 import net.swofty.swm.plugin.loader.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
 import org.bukkit.Bukkit;
@@ -51,7 +51,7 @@ public class subCommand_delete extends SWMCommand {
         if (args.length > 1) {
             source = args[1];
         } else {
-            WorldsConfig config = ConfigManager.getWorldConfig();
+            net.swofty.swm.api.world.data.WorldsConfig config = new ConfigManager().getWorldConfig();
             WorldData worldData = config.getWorlds().get(worldName);
 
             if (worldData == null) {
@@ -96,7 +96,7 @@ public class subCommand_delete extends SWMCommand {
                         loader.deleteWorld(worldName);
 
                         // Now let's delete it from the config file
-                        WorldsConfig config = ConfigManager.getWorldConfig();
+                        WorldsConfig config = new ConfigManager().getWorldConfig();
 
                         config.getWorlds().remove(worldName);
                         config.save();

@@ -42,7 +42,7 @@ public class CraftSlimeWorld implements SlimeWorld {
     private final CompoundTag extraData;
     private final List<CompoundTag> worldMaps;
 
-    private final SlimePropertyMap propertyMap;
+    private SlimePropertyMap propertyMap;
 
     private final boolean readOnly;
 
@@ -146,19 +146,6 @@ public class CraftSlimeWorld implements SlimeWorld {
         }
 
         return world;
-    }
-
-    @Override
-    public SlimeWorld.SlimeProperties getProperties() {
-        return SlimeWorld.SlimeProperties.builder().spawnX(propertyMap.getValue(SPAWN_X))
-                .spawnY(propertyMap.getValue(SPAWN_Y))
-                .spawnZ(propertyMap.getValue(SPAWN_Z))
-                .environment(propertyMap.getValue(ENVIRONMENT).toString())
-                .pvp(propertyMap.getValue(PVP))
-                .allowMonsters(propertyMap.getValue(ALLOW_MONSTERS))
-                .allowAnimals(propertyMap.getValue(ALLOW_ANIMALS))
-                .difficulty(Difficulty.valueOf(propertyMap.getValue(DIFFICULTY).toString().toUpperCase()).getValue())
-                .readOnly(readOnly).build();
     }
 
     // World Serialization methods

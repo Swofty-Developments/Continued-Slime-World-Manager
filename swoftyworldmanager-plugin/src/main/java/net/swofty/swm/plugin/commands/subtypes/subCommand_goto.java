@@ -19,7 +19,7 @@ public class subCommand_goto extends SWMCommand {
     @Override
     public void run(CommandSource sender, String[] args) {
         if (args.length == 0) {
-            sender.send("§cUsage: /swm goto <world> <player>");
+            sender.send("§cUsage: /swm goto <world> [player]");
             return;
         }
 

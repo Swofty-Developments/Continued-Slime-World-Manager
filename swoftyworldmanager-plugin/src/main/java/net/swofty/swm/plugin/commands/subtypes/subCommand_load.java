@@ -6,14 +6,14 @@ import net.swofty.swm.api.exceptions.UnknownWorldException;
 import net.swofty.swm.api.exceptions.WorldInUseException;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.world.SlimeWorld;
+import net.swofty.swm.api.world.data.WorldData;
+import net.swofty.swm.api.world.data.WorldsConfig;
 import net.swofty.swm.plugin.SWMPlugin;
 import net.swofty.swm.plugin.commands.CommandCooldown;
 import net.swofty.swm.plugin.commands.CommandParameters;
 import net.swofty.swm.plugin.commands.CommandSource;
 import net.swofty.swm.plugin.commands.SWMCommand;
 import net.swofty.swm.plugin.config.ConfigManager;
-import net.swofty.swm.plugin.config.WorldData;
-import net.swofty.swm.plugin.config.WorldsConfig;
 import net.swofty.swm.plugin.log.Logging;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -49,7 +49,7 @@ public class subCommand_load extends SWMCommand implements CommandCooldown {
             return;
         }
 
-        WorldsConfig config = ConfigManager.getWorldConfig();
+        WorldsConfig config = new ConfigManager().getWorldConfig();
         WorldData worldData = config.getWorlds().get(worldName);
 
         if (worldData == null) {
@@ -67,7 +67,6 @@ public class subCommand_load extends SWMCommand implements CommandCooldown {
 
         // It's best to load the world async, and then just go back to the server thread and add it to the world list
         Bukkit.getScheduler().runTaskAsynchronously(SWMPlugin.getInstance(), () -> {
-
             try {
                 long start = System.currentTimeMillis();
                 SlimeLoader loader = SWMPlugin.getInstance().getLoader(worldData.getDataSource());

@@ -2,13 +2,11 @@ package net.swofty.swm.plugin.commands.subtypes;
 
 import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.properties.SlimeProperties;
-import net.swofty.swm.api.world.properties.SlimePropertyMap;
 import net.swofty.swm.plugin.SWMPlugin;
 import net.swofty.swm.plugin.commands.CommandParameters;
 import net.swofty.swm.plugin.commands.CommandSource;
 import net.swofty.swm.plugin.commands.SWMCommand;
 import net.swofty.swm.plugin.config.ConfigManager;
-import net.swofty.swm.plugin.config.WorldData;
 import net.swofty.swm.plugin.log.Logging;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,12 +25,7 @@ public class subCommand_list extends SWMCommand {
 
     @Override
     public void run(CommandSource sender, String[] args) {
-        Map<String, SlimeWorld> slimeWorlds = Bukkit.getWorlds().stream()
-                .filter(world -> world != null && SWMPlugin.getInstance().getNms().getSlimeWorld(world) != null)
-                .collect(Collectors.toMap(
-                        World::getName,
-                        world -> SWMPlugin.getInstance().getNms().getSlimeWorld(world)
-                ));
+        Map<String, SlimeWorld> slimeWorlds = SWMPlugin.getInstance().getSlimeWorlds();
         ArrayList<World> bukkitWorlds = Bukkit.getWorlds().stream()
                 .filter(world -> world != null && SWMPlugin.getInstance().getNms().getSlimeWorld(world) == null)
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -64,7 +57,7 @@ public class subCommand_list extends SWMCommand {
 
         List<String> worldsList = new ArrayList<>(slimeWorlds.keySet());
         worldsList.addAll(bukkitWorlds.stream().map(World::getName).collect(Collectors.toList()));
-        ConfigManager.getWorldConfig().getWorlds().keySet().stream().filter((world) -> !worldsList.contains(world)).forEach(worldsList::add);
+        new ConfigManager().getWorldConfig().getWorlds().keySet().stream().filter((world) -> !worldsList.contains(world)).forEach(worldsList::add);
 
         if (worldsList.isEmpty()) {
             sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "There are no worlds configured.");

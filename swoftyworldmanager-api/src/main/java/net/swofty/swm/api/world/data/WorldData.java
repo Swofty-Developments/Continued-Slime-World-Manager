@@ -1,12 +1,10 @@
-package net.swofty.swm.plugin.config;
+package net.swofty.swm.api.world.data;
 
+import lombok.Data;
 import net.swofty.swm.api.world.properties.SlimeProperties;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
-import lombok.Data;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.bukkit.Difficulty;
-import org.bukkit.World;
 
 @Data
 @ConfigSerializable
@@ -40,12 +38,6 @@ public class WorldData {
     private boolean readOnly = false;
 
     public SlimePropertyMap toPropertyMap() {
-        try {
-            Enum.valueOf(Difficulty.class, this.difficulty.toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException("unknown difficulty '" + this.difficulty + "'");
-        }
-
         String[] spawnLocationSplit = spawn.split(", ");
 
         double spawnX, spawnY, spawnZ;
@@ -59,22 +51,6 @@ public class WorldData {
         }
 
         String environment = this.environment;
-
-        try {
-            Enum.valueOf(World.Environment.class, environment.toUpperCase());
-        } catch (IllegalArgumentException ex) {
-            try {
-                int envId = Integer.parseInt(environment);
-
-                if (envId < -1 || envId > 1) {
-                    throw new NumberFormatException(environment);
-                }
-
-                environment = World.Environment.getEnvironment(envId).name();
-            } catch (NumberFormatException ex2) {
-                throw new IllegalArgumentException("unknown environment '" + this.environment + "'");
-            }
-        }
 
         SlimePropertyMap propertyMap = new SlimePropertyMap();
 

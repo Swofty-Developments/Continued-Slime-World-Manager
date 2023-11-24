@@ -3,6 +3,7 @@ package net.swofty.swm.plugin.loader.loaders;
 import net.swofty.swm.api.exceptions.UnknownWorldException;
 import net.swofty.swm.api.exceptions.WorldInUseException;
 import net.swofty.swm.api.loaders.SlimeLoader;
+import net.swofty.swm.plugin.SWMPlugin;
 import net.swofty.swm.plugin.log.Logging;
 
 import java.io.File;
