@@ -115,9 +115,6 @@ public class WorldImporter {
             Optional<CompoundTag> dataTag = tag.get().getAsCompoundTag("Data");
 
             if (dataTag.isPresent()) {
-                // Data version
-                int dataVersion = dataTag.get().getIntValue("DataVersion").orElse(-1);
-
                 // Game rules
                 Map<String, String> gameRules = new HashMap<>();
                 Optional<CompoundTag> rulesList = dataTag.get().getAsCompoundTag("GameRules");
@@ -154,7 +151,6 @@ public class WorldImporter {
         }
 
         List<SlimeChunk> loadedChunks = chunks.stream().map((entry) -> {
-
             try {
                 DataInputStream headerStream = new DataInputStream(new ByteArrayInputStream(regionByteArray, entry.getOffset(), entry.getPaddedSize()));
 
@@ -205,13 +201,8 @@ public class WorldImporter {
             biomes = null;
         }
 
-        Optional<CompoundTag> optionalHeightMaps = compound.getAsCompoundTag("Heightmaps");
-        CompoundTag heightMapsCompound;
-
-        // Pre 1.13 world
-
+        CompoundTag heightMapsCompound = new CompoundTag("", new CompoundMap());
         int[] heightMap = compound.getIntArrayValue("HeightMap").orElse(new int[256]);
-        heightMapsCompound = new CompoundTag("", new CompoundMap());
         heightMapsCompound.getValue().put("heightMap", new IntArrayTag("heightMap", heightMap));
 
         List<CompoundTag> tileEntities = ((ListTag<CompoundTag>) compound.getAsListTag("TileEntities")
@@ -223,11 +214,6 @@ public class WorldImporter {
 
         for (CompoundTag sectionTag : sectionsTag.getValue()) {
             int index = sectionTag.getByteValue("Y").get();
-
-            if (index < 0) {
-                // For some reason MC 1.14 worlds contain an empty section with Y = -1.
-                continue;
-            }
 
             byte[] blocks = sectionTag.getByteArrayValue("Blocks").orElse(null);
             NibbleArray dataArray;
@@ -271,16 +257,6 @@ public class WorldImporter {
     private static boolean isEmpty(byte[] array) {
         for (byte b : array) {
             if (b != 0) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean isEmpty(long[] array) {
-        for (long b : array) {
-            if (b != 0L) {
                 return false;
             }
         }

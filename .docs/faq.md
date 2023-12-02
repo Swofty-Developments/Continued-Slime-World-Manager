@@ -13,6 +13,10 @@ Yes, you can! However, that requires doing some extra steps. Take a look at the 
 
 Multiverse-Core detects SWM worlds as unloaded, as it cannot find the world directory, and then just ignores them. Although there should be no issues, MV commands won't work with SWM worlds.
 
+* It appears that my reflections aren't working after installing, what happened?
+
+Follow the instructions found on this Spigot post in regards to relocation; https://www.spigotmc.org/threads/issue-with-reflections-library-and-multiple-plugins.397903/
+
 * What's the world size limit?
 
 The Slime Region Format can handle up a 46340x4630 chunk area. That's the maximum size that SWM can _theoretically_ handle, given enough memory. However, having a world so big is not recommended at all.

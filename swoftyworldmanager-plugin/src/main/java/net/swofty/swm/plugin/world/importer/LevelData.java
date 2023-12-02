@@ -8,7 +8,6 @@ import java.util.Map;
 @Getter
 @RequiredArgsConstructor
 public class LevelData {
-
     private final Map<String, String> gameRules;
 
     private final int spawnX;
