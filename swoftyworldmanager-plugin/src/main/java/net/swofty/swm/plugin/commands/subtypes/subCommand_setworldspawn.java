@@ -13,6 +13,7 @@ import net.swofty.swm.plugin.log.Logging;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.spigotmc.event.player.PlayerSpawnLocationEvent;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -35,6 +36,8 @@ public class subCommand_setworldspawn extends SWMCommand implements CommandCoold
 
         worldData.setSpawn(sender.getPlayer().getLocation().getBlockX() + ", " + sender.getPlayer().getLocation().getBlockY() + ", " + sender.getPlayer().getLocation().getBlockZ());
         config.save();
+
+        world.setSpawnLocation(sender.getPlayer().getLocation().getBlockX(), sender.getPlayer().getLocation().getBlockY(), sender.getPlayer().getLocation().getBlockZ());
 
         sender.send(Logging.COMMAND_PREFIX + ChatColor.GREEN + "Set world spawn for world " + world.getName() + " to " + sender.getPlayer().getLocation().getBlockX() + ", " + sender.getPlayer().getLocation().getBlockY() + ", " + sender.getPlayer().getLocation().getBlockZ() + "!");
     }

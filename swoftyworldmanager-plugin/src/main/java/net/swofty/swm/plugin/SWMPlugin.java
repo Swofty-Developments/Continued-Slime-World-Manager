@@ -24,6 +24,7 @@ import net.swofty.swm.plugin.config.ConfigManager;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bukkit.*;
 import org.bukkit.command.CommandMap;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
@@ -67,6 +68,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
             ex.printStackTrace();
             return;
         }
+
         LoaderUtils.registerLoaders();
 
         /*
