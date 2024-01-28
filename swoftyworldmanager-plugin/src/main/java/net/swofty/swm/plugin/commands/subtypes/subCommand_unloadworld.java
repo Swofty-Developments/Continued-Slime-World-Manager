@@ -39,6 +39,8 @@ public class subCommand_unloadworld extends SWMCommand implements CommandCooldow
 
         SlimeWorld world = SWMPlugin.getInstance().getNms().getSlimeWorld(Bukkit.getWorld(args[0]));
         world.unloadWorld(true);
+
+        sender.send(Logging.COMMAND_PREFIX + "Unloaded world " + ChatColor.AQUA + args[0] + ChatColor.GRAY + "!");
     }
 
     @Override

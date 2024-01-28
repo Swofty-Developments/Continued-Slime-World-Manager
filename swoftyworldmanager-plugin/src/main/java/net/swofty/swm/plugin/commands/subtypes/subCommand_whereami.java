@@ -13,7 +13,7 @@ import java.util.List;
 public class subCommand_whereami extends SWMCommand {
     @Override
     public void run(CommandSource sender, String[] args) {
-        sender.send(Logging.COMMAND_PREFIX + ChatColor.GRAY + " You are currently in " +
+        sender.send(Logging.COMMAND_PREFIX + ChatColor.GRAY + "You are currently in " +
                 ChatColor.GREEN + sender.getPlayer().getWorld().getName() + ChatColor.GRAY + "!");
     }
 

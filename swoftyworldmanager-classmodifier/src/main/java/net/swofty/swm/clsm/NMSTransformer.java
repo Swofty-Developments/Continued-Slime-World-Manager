@@ -32,6 +32,11 @@ public class NMSTransformer implements ClassFileTransformer {
 
     private static Map<String, Change[]> changes = new HashMap<>();
 
+    /**
+     * Called when the agent is loaded.
+     * @param agentArgs Arguments passed to the agent
+     * @param instrumentation The instrumentation instance
+     */
     public static void premain(String agentArgs, Instrumentation instrumentation) {
         instrumentation.addTransformer(new NMSTransformer());
 
@@ -198,11 +203,9 @@ public class NMSTransformer implements ClassFileTransformer {
     @Getter
     @RequiredArgsConstructor
     private static class Change {
-
         private final String methodName;
         private final String[] params;
         private final String content;
         private final boolean optional;
-
     }
 }

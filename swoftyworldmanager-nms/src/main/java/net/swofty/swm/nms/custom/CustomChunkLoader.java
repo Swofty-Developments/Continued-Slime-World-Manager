@@ -34,7 +34,11 @@ public class CustomChunkLoader implements IChunkLoader {
     void loadAllChunks(CustomWorldServer server) {
         for (SlimeChunk chunk : new ArrayList<>(world.getChunks().values())) {
             Chunk nmsChunk = createChunk(server, chunk);
-            world.updateChunk(new NMSSlimeChunk(nmsChunk));
+            NMSSlimeChunk slimeChunk = new NMSSlimeChunk(nmsChunk);
+            world.updateChunk(slimeChunk);
+
+            // Manually call Java garbage collector
+            System.gc();
         }
     }
 

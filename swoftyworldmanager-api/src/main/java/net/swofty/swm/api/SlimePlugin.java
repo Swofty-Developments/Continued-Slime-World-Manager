@@ -1,5 +1,6 @@
 package net.swofty.swm.api;
 
+import jdk.jfr.Experimental;
 import net.swofty.swm.api.exceptions.CorruptedWorldException;
 import net.swofty.swm.api.exceptions.InvalidWorldException;
 import net.swofty.swm.api.exceptions.NewerFormatException;
@@ -10,6 +11,7 @@ import net.swofty.swm.api.exceptions.WorldLoadedException;
 import net.swofty.swm.api.exceptions.WorldTooBigException;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.world.SlimeWorld;
+import net.swofty.swm.api.world.SlimeWorldImporter;
 import net.swofty.swm.api.world.data.ConfigManager;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
 
@@ -133,4 +135,9 @@ public interface SlimePlugin {
             InvalidWorldException, WorldLoadedException, WorldTooBigException, IOException;
 
     Map<String, SlimeWorld> getSlimeWorlds();
+
+
+    @ApiStatus.AvailableSince("4.0.0")
+    @ApiStatus.Internal
+    SlimeWorldImporter getWorldImporter();
 }

@@ -58,8 +58,8 @@ public class subCommand_goto extends SWMCommand {
             spawnLocation.add(0, 1, 0);
         }
 
+        spawnLocation.setWorld(world);
         target.teleport(spawnLocation);
-
     }
 
     @Override

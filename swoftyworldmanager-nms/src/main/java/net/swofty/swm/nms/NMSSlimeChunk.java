@@ -37,6 +37,11 @@ public class NMSSlimeChunk implements SlimeChunk {
     }
 
     @Override
+    public long getId() {
+        return (((long) getZ()) * Integer.MAX_VALUE + ((long) getX()));
+    }
+
+    @Override
     public SlimeChunkSection[] getSections() {
         SlimeChunkSection[] sections = new SlimeChunkSection[16];
 

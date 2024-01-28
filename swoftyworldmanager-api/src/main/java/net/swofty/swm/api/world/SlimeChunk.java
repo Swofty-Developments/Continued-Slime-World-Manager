@@ -30,6 +30,8 @@ public interface SlimeChunk {
      */
     int getZ();
 
+    long getId();
+
     /**
      * Returns all the sections of the chunk.
      *

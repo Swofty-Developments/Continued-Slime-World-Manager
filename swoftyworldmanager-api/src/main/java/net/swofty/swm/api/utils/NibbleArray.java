@@ -7,9 +7,9 @@ import lombok.Getter;
  *
  * Source: https://github.com/Minikloon/CraftyWorld/blob/master/crafty-common/src/main/kotlin/world/crafty/common/utils/NibbleArray.kt
  */
+@Getter
 public class NibbleArray {
 
-    @Getter
     private final byte[] backing;
 
     public NibbleArray(int size) {

@@ -2,34 +2,36 @@ package net.swofty.swm.plugin;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
+import lombok.Getter;
 import net.swofty.swm.api.SlimePlugin;
 import net.swofty.swm.api.events.PostGenerateWorldEvent;
 import net.swofty.swm.api.events.PreGenerateWorldEvent;
 import net.swofty.swm.api.exceptions.*;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.world.SlimeWorld;
+import net.swofty.swm.api.world.SlimeWorldImporter;
 import net.swofty.swm.api.world.data.WorldData;
 import net.swofty.swm.api.world.data.WorldsConfig;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
-import net.swofty.swm.nms.craft.CraftSlimeWorld;
 import net.swofty.swm.nms.SlimeNMS;
+import net.swofty.swm.nms.craft.CraftSlimeWorld;
 import net.swofty.swm.plugin.commands.CommandLoader;
 import net.swofty.swm.plugin.commands.SWMCommand;
+import net.swofty.swm.plugin.config.ConfigManager;
 import net.swofty.swm.plugin.loader.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
+import net.swofty.swm.plugin.world.importer.ImporterImpl;
 import net.swofty.swm.plugin.world.WorldUnlocker;
-import net.swofty.swm.plugin.world.importer.WorldImporter;
-import lombok.Getter;
-import net.swofty.swm.plugin.config.ConfigManager;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -366,7 +368,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
             throw new WorldLoadedException(worldDir.getName());
         }
 
-        CraftSlimeWorld world = WorldImporter.readFromDirectory(worldDir);
+        CraftSlimeWorld world = (CraftSlimeWorld) getWorldImporter().readFromDirectory(worldDir);
 
         byte[] serializedWorld;
 
@@ -387,5 +389,10 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
                         World::getName,
                         world -> SWMPlugin.getInstance().getNms().getSlimeWorld(world)
                 ));
+    }
+
+    @Override
+    public SlimeWorldImporter getWorldImporter() {
+        return new ImporterImpl();
     }
 }

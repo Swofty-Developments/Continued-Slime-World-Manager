@@ -21,10 +21,6 @@ public class SlimeNMS {
 
     private static final Logger LOGGER = LogManager.getLogger("SWM");
 
-    private final byte worldVersion = 0x01;
-
-    private boolean loadingDefaultWorlds = true; // If true, the addWorld method will not be skipped
-
     private WorldServer defaultWorld;
     private WorldServer defaultNetherWorld;
     private WorldServer defaultEndWorld;
@@ -58,8 +54,6 @@ public class SlimeNMS {
             World.Environment env = World.Environment.valueOf(endWorld.getPropertyMap().getValue(SlimeProperties.ENVIRONMENT).toUpperCase());
             defaultEndWorld = new CustomWorldServer((CraftSlimeWorld) endWorld, new CustomDataManager(endWorld), env.getId());
         }
-
-        loadingDefaultWorlds = false;
     }
 
     public Object createNMSWorld(SlimeWorld world) {
