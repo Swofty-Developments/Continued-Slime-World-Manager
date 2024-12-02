@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ImporterImpl implements SlimeWorldImporter {
-    private static final Pattern MAP_FILE_PATTERN = Pattern.compile("^(?:map_([0-9]*).dat)$");
+    private static final Pattern MAP_FILE_PATTERN = Pattern.compile("^map_([0-9]*).dat$");
 
     @Override
     public SlimeWorld readFromDirectory(File worldDir) throws InvalidWorldException {

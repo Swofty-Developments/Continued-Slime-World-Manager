@@ -20,12 +20,18 @@ import net.swofty.swm.plugin.commands.SWMCommand;
 import net.swofty.swm.plugin.config.ConfigManager;
 import net.swofty.swm.plugin.loader.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
+import net.swofty.swm.plugin.world.DefaultLevelEvents;
 import net.swofty.swm.plugin.world.importer.ImporterImpl;
 import net.swofty.swm.plugin.world.WorldUnlocker;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 
@@ -40,7 +46,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Getter
-public class SWMPlugin extends JavaPlugin implements SlimePlugin {
+public class SWMPlugin extends JavaPlugin implements SlimePlugin, Listener {
 
     @Getter
     private static SWMPlugin instance;
@@ -148,6 +154,7 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
         }
 
         getServer().getPluginManager().registerEvents(new WorldUnlocker(), this);
+        getServer().getPluginManager().registerEvents(new DefaultLevelEvents(), this);
 
         toGenerate.forEach(this::generateWorld);
     }

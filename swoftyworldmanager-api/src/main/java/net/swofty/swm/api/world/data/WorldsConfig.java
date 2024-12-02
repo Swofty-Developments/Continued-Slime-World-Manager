@@ -9,4 +9,8 @@ public interface WorldsConfig {
     void save();
 
     Map<String, WorldData> getWorlds();
+
+    default boolean hasWorld(String worldName) {
+        return getWorlds().containsKey(worldName);
+    }
 }

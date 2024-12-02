@@ -1,5 +1,6 @@
 package net.swofty.swm.nms;
 
+import lombok.extern.java.Log;
 import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.properties.SlimeProperties;
 import net.swofty.swm.nms.craft.CraftSlimeWorld;
@@ -71,6 +72,13 @@ public class SlimeNMS {
         CustomWorldServer server = (CustomWorldServer) worldObject;
         String worldName = server.getWorldData().getName();
 
+        String defaultLevel = Bukkit.getWorlds().get(0).getName();
+        if (worldName.equals(defaultLevel)) {
+            Bukkit.unloadWorld(worldName, false);
+            LOGGER.info("Manually updating " + worldName + " due to it being the default world.");
+        } else
+
+        // World is already initialized on the server
         if (Bukkit.getWorld(worldName) != null) {
             throw new IllegalArgumentException("World " + worldName + " already exists! Maybe it's an outdated SlimeWorld object?");
         }
