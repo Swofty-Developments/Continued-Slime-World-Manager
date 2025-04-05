@@ -1,7 +1,7 @@
 ![](https://cdn.discordapp.com/attachments/1122145806066126899/1162312766242160640/image.png?ex=6686639e&is=6685121e&hm=4cb2d8c11923a30fd976746fd60eb6332639befc3ea0b2cbf4d224e5c089470a&)
 # Continued Slime World Manager
 
-[<img src="https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg" alt="" height="55" />](https://discord.gg/atlasmc)
+[<img src="https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg" alt="" height="55" />](https://discord.gg/paper)
 
 Continued Slime World Manager is a 1.8.x variant of Slime World Manager which is intended to continue on with the development and maintenance. Its goal is to provide server administrators with an easy-to-use tool to load worlds faster and save space.
 
@@ -10,7 +10,7 @@ Correct, this is at the core of this continuations design. For versions 1.17 and
 
 #### Releases
 
-Releases are auto deployed on push onto the GitHub releases page which can be found [here](https://github.com/Swofty-Developments/Continued-Slime-World-Manager/releases). Updates are also periodically sent within my discord server located at [discord.gg/atlasmc](discord.gg/atlasmc).
+Releases are auto deployed on push onto the GitHub releases page which can be found [here](https://github.com/Swofty-Developments/Continued-Slime-World-Manager/releases). Updates are also periodically sent within my discord server located at [discord.gg/paper](discord.gg/paper).
 
 ## Using CSWM in your plugin
 
