@@ -27,6 +27,7 @@ import org.bukkit.entity.Player;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -214,7 +215,7 @@ public class CraftSlimeWorld implements SlimeWorld {
 
             // Chunks
             byte[] chunkData = serializeChunks(sortedChunks);
-            byte[] compressedChunkData = Zstd.compress(chunkData);
+            byte[] compressedChunkData = Zstd.compress(chunkData, 19);
 
             outStream.writeInt(compressedChunkData.length);
             outStream.writeInt(chunkData.length);
@@ -225,7 +226,7 @@ public class CraftSlimeWorld implements SlimeWorld {
             ListTag<CompoundTag> tileEntitiesNbtList = new ListTag<>("tiles", TagType.TAG_COMPOUND, tileEntitiesList);
             CompoundTag tileEntitiesCompound = new CompoundTag("", new CompoundMap(Collections.singletonList(tileEntitiesNbtList)));
             byte[] tileEntitiesData = serializeCompoundTag(tileEntitiesCompound);
-            byte[] compressedTileEntitiesData = Zstd.compress(tileEntitiesData);
+            byte[] compressedTileEntitiesData = Zstd.compress(tileEntitiesData, 19);
 
             outStream.writeInt(compressedTileEntitiesData.length);
             outStream.writeInt(tileEntitiesData.length);
@@ -240,7 +241,7 @@ public class CraftSlimeWorld implements SlimeWorld {
                 ListTag<CompoundTag> entitiesNbtList = new ListTag<>("entities", TagType.TAG_COMPOUND, entitiesList);
                 CompoundTag entitiesCompound = new CompoundTag("", new CompoundMap(Collections.singletonList(entitiesNbtList)));
                 byte[] entitiesData = serializeCompoundTag(entitiesCompound);
-                byte[] compressedEntitiesData = Zstd.compress(entitiesData);
+                byte[] compressedEntitiesData = Zstd.compress(entitiesData, 19);
 
                 outStream.writeInt(compressedEntitiesData.length);
                 outStream.writeInt(entitiesData.length);
@@ -249,7 +250,7 @@ public class CraftSlimeWorld implements SlimeWorld {
 
             // Extra Tag
             byte[] extra = serializeCompoundTag(extraData);
-            byte[] compressedExtra = Zstd.compress(extra);
+            byte[] compressedExtra = Zstd.compress(extra, 19);
 
             outStream.writeInt(compressedExtra.length);
             outStream.writeInt(extra.length);
@@ -262,7 +263,7 @@ public class CraftSlimeWorld implements SlimeWorld {
             CompoundTag mapsCompound = new CompoundTag("", map);
 
             byte[] mapArray = serializeCompoundTag(mapsCompound);
-            byte[] compressedMapArray = Zstd.compress(mapArray);
+            byte[] compressedMapArray = Zstd.compress(mapArray, 19);
 
             outStream.writeInt(compressedMapArray.length);
             outStream.writeInt(mapArray.length);
@@ -293,16 +294,16 @@ public class CraftSlimeWorld implements SlimeWorld {
             // Height Maps
             int[] heightMap = chunk.getHeightMaps().getIntArrayValue("heightMap").orElse(new int[256]);
 
-            for (int i = 0; i < 256; i++) {
-                outStream.writeInt(heightMap[i]);
-            }
+            ByteBuffer heightMapBuffer = ByteBuffer.allocate(1024).order(ByteOrder.BIG_ENDIAN);
+            heightMapBuffer.asIntBuffer().put(heightMap);
+            outStream.write(heightMapBuffer.array());
 
             // Biomes
             int[] biomes = chunk.getBiomes();
 
-            for (int biome : biomes) {
-                outStream.writeInt(biome);
-            }
+            ByteBuffer biomesBuffer = ByteBuffer.allocate(biomes.length * 4).order(ByteOrder.BIG_ENDIAN);
+            biomesBuffer.asIntBuffer().put(biomes);
+            outStream.write(biomesBuffer.array());
 
             // Chunk sections
             SlimeChunkSection[] sections = chunk.getSections();

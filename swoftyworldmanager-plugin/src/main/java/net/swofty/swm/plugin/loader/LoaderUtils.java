@@ -316,11 +316,11 @@ public class LoaderUtils {
                     // Height Maps
                     CompoundTag heightMaps;
 
-                    int[] heightMap = new int[256];
+                    byte[] heightMapBytes = new byte[1024];
+                    dataStream.readFully(heightMapBytes);
 
-                    for (int i = 0; i < 256; i++) {
-                        heightMap[i] = dataStream.readInt();
-                    }
+                    int[] heightMap = new int[256];
+                    ByteBuffer.wrap(heightMapBytes).order(ByteOrder.BIG_ENDIAN).asIntBuffer().get(heightMap);
 
                     CompoundMap map = new CompoundMap();
                     map.put("heightMap", new IntArrayTag("heightMap", heightMap));
