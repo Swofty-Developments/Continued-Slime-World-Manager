@@ -31,18 +31,7 @@ public class CustomChunkLoader implements IChunkLoader {
 
     private final CraftSlimeWorld world;
 
-    void loadAllChunks(CustomWorldServer server) {
-        for (SlimeChunk chunk : new ArrayList<>(world.getChunks().values())) {
-            Chunk nmsChunk = createChunk(server, chunk);
-            NMSSlimeChunk slimeChunk = new NMSSlimeChunk(nmsChunk);
-            world.updateChunk(slimeChunk);
-
-            // Manually call Java garbage collector
-            System.gc();
-        }
-    }
-
-    private Chunk createChunk(CustomWorldServer server, SlimeChunk chunk) {
+    private Chunk createChunk(World server, SlimeChunk chunk) {
         int x = chunk.getX();
         int z = chunk.getZ();
 
@@ -55,7 +44,7 @@ public class CustomChunkLoader implements IChunkLoader {
 
         // Height map
         CompoundTag heightMapsCompound = chunk.getHeightMaps();
-        int[] heightMap = heightMapsCompound.getIntArrayValue("heightMap").get();
+        int[] heightMap = heightMapsCompound.getIntArrayValue("heightMap").orElse(new int[256]);
 
         nmsChunk.a(heightMap);
 
@@ -179,7 +168,7 @@ public class CustomChunkLoader implements IChunkLoader {
     }
 
     private byte[] toByteArray(int[] ints) {
-        ByteBuffer buf = ByteBuffer.allocate(ints.length * 4).order(ByteOrder.LITTLE_ENDIAN);
+        ByteBuffer buf = ByteBuffer.allocate(ints.length * 4).order(ByteOrder.BIG_ENDIAN);
         buf.asIntBuffer().put(ints);
 
         return buf.array();
@@ -198,8 +187,9 @@ public class CustomChunkLoader implements IChunkLoader {
             chunk.e(true);
         } else if (slimeChunk instanceof NMSSlimeChunk) {
             chunk = ((NMSSlimeChunk) slimeChunk).getChunk();
-        } else { // All SlimeChunk objects should be converted to NMSSlimeChunks when loading the world
-            throw new IllegalStateException("Chunk (" + x + ", " + z + ") has not been converted to a NMSSlimeChunk object!");
+        } else {
+            chunk = createChunk(nmsWorld, slimeChunk);
+            world.updateChunk(new NMSSlimeChunk(chunk));
         }
 
         return chunk;

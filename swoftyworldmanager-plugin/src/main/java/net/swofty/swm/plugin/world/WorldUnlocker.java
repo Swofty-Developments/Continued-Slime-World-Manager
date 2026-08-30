@@ -2,6 +2,7 @@ package net.swofty.swm.plugin.world;
 
 import net.swofty.swm.api.exceptions.UnknownWorldException;
 import net.swofty.swm.api.world.SlimeWorld;
+import net.swofty.swm.nms.SlimeNMS;
 import net.swofty.swm.plugin.SWMPlugin;
 import net.swofty.swm.plugin.log.Logging;
 import org.bukkit.Bukkit;
@@ -16,11 +17,19 @@ public class WorldUnlocker implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onWorldUnload(WorldUnloadEvent event) {
-        SlimeWorld world = SWMPlugin.getInstance().getNms().getSlimeWorld(event.getWorld());
+        SlimeNMS nms = SWMPlugin.getInstance().getNms();
+        SlimeWorld world = nms.getSlimeWorld(event.getWorld());
 
-        if (world != null) {
-            Bukkit.getScheduler().runTaskAsynchronously(SWMPlugin.getInstance(), () -> unlockWorld(world));
+        if (world == null || world.isReadOnly() || nms.isUnloading(event.getWorld())) {
+            return;
         }
+
+        Runnable saveAwaiter = nms.createSaveAwaiter(event.getWorld());
+
+        Bukkit.getScheduler().runTaskAsynchronously(SWMPlugin.getInstance(), () -> {
+            saveAwaiter.run();
+            unlockWorld(world);
+        });
     }
 
     private void unlockWorld(SlimeWorld world) {

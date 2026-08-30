@@ -1,6 +1,5 @@
 package net.swofty.swm.nms;
 
-import lombok.extern.java.Log;
 import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.properties.SlimeProperties;
 import net.swofty.swm.nms.craft.CraftSlimeWorld;
@@ -17,10 +16,15 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Getter
 public class SlimeNMS {
 
     private static final Logger LOGGER = LogManager.getLogger("SWM");
+
+    private final Set<Integer> pendingDimensions = ConcurrentHashMap.newKeySet();
 
     private WorldServer defaultWorld;
     private WorldServer defaultNetherWorld;
@@ -31,7 +35,7 @@ public class SlimeNMS {
             CraftCLSMBridge.initialize(this);
         }  catch (NoClassDefFoundError ex) {
             LOGGER.error("Failed to find ClassModifier classes. Are you sure you installed it correctly?");
-            System.exit(1); // No ClassModifier, no party, sadge
+            System.exit(1);
         }
     }
 
@@ -43,25 +47,62 @@ public class SlimeNMS {
                 LOGGER.warn("The environment for the default world must always be 'NORMAL'.");
             }
 
-            defaultWorld = new CustomWorldServer((CraftSlimeWorld) normalWorld, new CustomDataManager(normalWorld), 0);
+            defaultWorld = createDefaultWorld(normalWorld, 0);
         }
 
         if (netherWorld != null) {
             World.Environment env = World.Environment.valueOf(netherWorld.getPropertyMap().getValue(SlimeProperties.ENVIRONMENT).toUpperCase());
-            defaultNetherWorld = new CustomWorldServer((CraftSlimeWorld) netherWorld, new CustomDataManager(netherWorld), env.getId());
+            defaultNetherWorld = createDefaultWorld(netherWorld, env.getId());
         }
 
         if (endWorld != null) {
             World.Environment env = World.Environment.valueOf(endWorld.getPropertyMap().getValue(SlimeProperties.ENVIRONMENT).toUpperCase());
-            defaultEndWorld = new CustomWorldServer((CraftSlimeWorld) endWorld, new CustomDataManager(endWorld), env.getId());
+            defaultEndWorld = createDefaultWorld(endWorld, env.getId());
         }
     }
 
-    public Object createNMSWorld(SlimeWorld world) {
-        CustomDataManager dataManager = new CustomDataManager(world);
-        MinecraftServer mcServer = MinecraftServer.getServer();
+    private CustomWorldServer createDefaultWorld(SlimeWorld world, int dimension) {
+        CustomWorldServer worldServer = new CustomWorldServer((CraftSlimeWorld) world, new CustomDataManager(world), dimension);
 
-        return new CustomWorldServer((CraftSlimeWorld) world, dataManager, CraftWorld.CUSTOM_DIMENSION_OFFSET + mcServer.worlds.size());
+        worldServer.setReady(true);
+        MinecraftServer.getServer().server.addWorld(worldServer.getWorld());
+
+        return worldServer;
+    }
+
+    public int reserveDimension() {
+        MinecraftServer mcServer = MinecraftServer.getServer();
+        int dimension = CraftWorld.CUSTOM_DIMENSION_OFFSET;
+        boolean used = true;
+
+        while (used) {
+            used = pendingDimensions.contains(dimension);
+
+            if (!used) {
+                for (WorldServer server : mcServer.worlds) {
+                    if (server.dimension == dimension) {
+                        used = true;
+                        break;
+                    }
+                }
+            }
+
+            if (used) {
+                dimension++;
+            }
+        }
+
+        pendingDimensions.add(dimension);
+
+        return dimension;
+    }
+
+    public void releaseDimension(int dimension) {
+        pendingDimensions.remove(dimension);
+    }
+
+    public Object createNMSWorld(SlimeWorld world, int dimension) {
+        return new CustomWorldServer((CraftSlimeWorld) world, new CustomDataManager(world), dimension);
     }
 
     public void addWorldToServerList(Object worldObject) {
@@ -72,13 +113,6 @@ public class SlimeNMS {
         CustomWorldServer server = (CustomWorldServer) worldObject;
         String worldName = server.getWorldData().getName();
 
-        String defaultLevel = Bukkit.getWorlds().get(0).getName();
-        if (worldName.equals(defaultLevel)) {
-            Bukkit.unloadWorld(worldName, false);
-            LOGGER.info("Manually updating " + worldName + " due to it being the default world.");
-        } else
-
-        // World is already initialized on the server
         if (Bukkit.getWorld(worldName) != null) {
             throw new IllegalArgumentException("World " + worldName + " already exists! Maybe it's an outdated SlimeWorld object?");
         }
@@ -88,6 +122,7 @@ public class SlimeNMS {
 
         mcServer.server.addWorld(server.getWorld());
         mcServer.worlds.add(server);
+        releaseDimension(server.dimension);
 
         Bukkit.getPluginManager().callEvent(new WorldInitEvent(server.getWorld()));
         Bukkit.getPluginManager().callEvent(new WorldLoadEvent(server.getWorld()));
@@ -105,5 +140,29 @@ public class SlimeNMS {
         CustomWorldServer worldServer = (CustomWorldServer) craftWorld.getHandle();
 
         return worldServer.getSlimeWorld();
+    }
+
+    public boolean isDefaultWorld(World world) {
+        Object handle = ((CraftWorld) world).getHandle();
+
+        return handle == defaultWorld || handle == defaultNetherWorld || handle == defaultEndWorld;
+    }
+
+    public boolean isUnloading(World world) {
+        CraftWorld craftWorld = (CraftWorld) world;
+
+        return craftWorld.getHandle() instanceof CustomWorldServer && ((CustomWorldServer) craftWorld.getHandle()).isUnloading();
+    }
+
+    public Runnable createSaveAwaiter(World world) {
+        CraftWorld craftWorld = (CraftWorld) world;
+
+        if (!(craftWorld.getHandle() instanceof CustomWorldServer)) {
+            return () -> { };
+        }
+
+        CustomWorldServer server = (CustomWorldServer) craftWorld.getHandle();
+
+        return server::awaitPendingSave;
     }
 }

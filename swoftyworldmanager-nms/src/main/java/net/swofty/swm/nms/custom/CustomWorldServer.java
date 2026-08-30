@@ -13,6 +13,7 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -26,9 +27,15 @@ public class CustomWorldServer extends WorldServer {
     private final CraftSlimeWorld slimeWorld;
     private final Object saveLock = new Object();
 
+    private volatile CompletableFuture<Void> pendingSave = CompletableFuture.completedFuture(null);
+
     @Getter
     @Setter
     private boolean ready = false;
+
+    @Getter
+    @Setter
+    private volatile boolean unloading = false;
 
     public CustomWorldServer(CraftSlimeWorld world, IDataManager dataManager, int dimension) {
         super(MinecraftServer.getServer(), dataManager, dataManager.getWorldData(), dimension, MinecraftServer.getServer().methodProfiler,
@@ -39,7 +46,6 @@ public class CustomWorldServer extends WorldServer {
         this.tracker = new EntityTracker(this);
         addIWorldAccess(new WorldManager(MinecraftServer.getServer(), this));
 
-        // Set world properties
         SlimePropertyMap propertyMap = world.getPropertyMap();
 
         worldData.setDifficulty(EnumDifficulty.valueOf(propertyMap.getValue(SlimeProperties.DIFFICULTY).toUpperCase()));
@@ -47,21 +53,20 @@ public class CustomWorldServer extends WorldServer {
         super.setSpawnFlags(propertyMap.getValue(SlimeProperties.ALLOW_MONSTERS), propertyMap.getValue(SlimeProperties.ALLOW_ANIMALS));
 
         this.pvpMode = propertyMap.getValue(SlimeProperties.PVP);
-
-        // Load all chunks
-        CustomChunkLoader chunkLoader = ((CustomDataManager) this.getDataManager()).getChunkLoader();
-        chunkLoader.loadAllChunks(this);
     }
 
     @Override
     public void save(boolean forceSave, IProgressUpdate progressUpdate) throws ExceptionWorldConflict {
-        if (!slimeWorld.isReadOnly()) {
-            super.save(forceSave, progressUpdate);
+        if (slimeWorld.isReadOnly()) {
+            return;
+        }
 
-            if (MinecraftServer.getServer().isStopped()) { // Make sure the SlimeWorld gets saved before stopping the server by running it from the main thread
-                save();
+        super.save(forceSave, progressUpdate);
 
-                // Have to manually unlock the world as well
+        if (unloading || MinecraftServer.getServer().isStopped()) {
+            save();
+
+            if (MinecraftServer.getServer().isStopped()) {
                 try {
                     slimeWorld.getLoader().unlockWorld(slimeWorld.getName());
                 } catch (IOException ex) {
@@ -71,14 +76,22 @@ public class CustomWorldServer extends WorldServer {
                 } catch (UnknownWorldException ignored) {
 
                 }
-            } else {
-                WORLD_SAVER_SERVICE.execute(this::save);
             }
+        } else {
+            pendingSave = CompletableFuture.runAsync(() -> {
+                if (!unloading) {
+                    save();
+                }
+            }, WORLD_SAVER_SERVICE);
         }
     }
 
+    public void awaitPendingSave() {
+        pendingSave.join();
+    }
+
     private void save() {
-        synchronized (saveLock) { // Don't want to save the slimeWorld from multiple threads simultaneously
+        synchronized (saveLock) {
             try {
                 LOGGER.info("Saving world " + slimeWorld.getName() + "...");
                 long start = System.currentTimeMillis();

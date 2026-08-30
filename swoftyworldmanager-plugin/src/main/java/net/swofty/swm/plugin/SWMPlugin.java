@@ -20,18 +20,12 @@ import net.swofty.swm.plugin.commands.SWMCommand;
 import net.swofty.swm.plugin.config.ConfigManager;
 import net.swofty.swm.plugin.loader.LoaderUtils;
 import net.swofty.swm.plugin.log.Logging;
-import net.swofty.swm.plugin.world.DefaultLevelEvents;
 import net.swofty.swm.plugin.world.importer.ImporterImpl;
 import net.swofty.swm.plugin.world.WorldUnlocker;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandMap;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
 
@@ -46,7 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 @Getter
-public class SWMPlugin extends JavaPlugin implements SlimePlugin, Listener {
+public class SWMPlugin extends JavaPlugin implements SlimePlugin {
 
     @Getter
     private static SWMPlugin instance;
@@ -133,11 +127,21 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin, Listener {
                 System.exit(1);
             }
 
-            Map<String, SlimeWorld> loadedWorlds = getSlimeWorlds();
+            Map<String, SlimeWorld> loadedWorlds = new HashMap<>();
+
+            synchronized (toGenerate) {
+                for (SlimeWorld world : toGenerate) {
+                    loadedWorlds.put(world.getName(), world);
+                }
+            }
 
             SlimeWorld defaultWorld = loadedWorlds.get(defaultWorldName);
             SlimeWorld netherWorld = getServer().getAllowNether() ? loadedWorlds.get(defaultWorldName + "_nether") : null;
             SlimeWorld endWorld = getServer().getAllowEnd() ? loadedWorlds.get(defaultWorldName + "_the_end") : null;
+
+            toGenerate.remove(defaultWorld);
+            toGenerate.remove(netherWorld);
+            toGenerate.remove(endWorld);
 
             nms.setDefaultWorlds(defaultWorld, netherWorld, endWorld);
         } catch (IOException ex) {
@@ -154,24 +158,37 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin, Listener {
         }
 
         getServer().getPluginManager().registerEvents(new WorldUnlocker(), this);
-        getServer().getPluginManager().registerEvents(new DefaultLevelEvents(), this);
 
-        toGenerate.forEach(this::generateWorld);
+        synchronized (toGenerate) {
+            toGenerate.forEach(this::generateWorld);
+            toGenerate.clear();
+        }
     }
 
     @Override
     public void onDisable() {
-        Bukkit.getWorlds().stream()
-                .map(world -> getNms().getSlimeWorld(world))
-                .filter(Objects::nonNull)
-                .forEach(world -> {
-                    world.unloadWorld(true);
-                    try {
-                        world.getLoader().unlockWorld(world.getName());
-                    } catch (UnknownWorldException | IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        List<World> worlds = new ArrayList<>(Bukkit.getWorlds());
+
+        for (World world : worlds) {
+            if (nms.isDefaultWorld(world)) {
+                continue;
+            }
+
+            SlimeWorld slimeWorld = nms.getSlimeWorld(world);
+
+            if (slimeWorld == null) {
+                continue;
+            }
+
+            try {
+                slimeWorld.unloadWorld(true);
+            } catch (RuntimeException ex) {
+                Logging.error("Failed to unload world " + slimeWorld.getName() + ": " + ex.getMessage());
+            }
+        }
+
+        worldGeneratorService.shutdown();
+        LoaderUtils.closeLoaders();
     }
 
     private SlimeNMS getNMSBridge() throws InvalidVersionException {
@@ -292,17 +309,25 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin, Listener {
         }
 
         CompletableFuture<Void> future = new CompletableFuture<>();
+        int dimension = nms.reserveDimension();
 
-        /*
-        Async World Generation
-         */
         worldGeneratorService.submit(() -> {
-            Object nmsWorld = nms.createNMSWorld(world);
-            Bukkit.getScheduler().runTask(this, () -> {
-                nms.addWorldToServerList(nmsWorld);
-                Bukkit.getPluginManager().callEvent(new PostGenerateWorldEvent(world));
-                future.complete(null);
-            });
+            try {
+                Object nmsWorld = nms.createNMSWorld(world, dimension);
+                Bukkit.getScheduler().runTask(this, () -> {
+                    try {
+                        nms.addWorldToServerList(nmsWorld);
+                        Bukkit.getPluginManager().callEvent(new PostGenerateWorldEvent(world));
+                        future.complete(null);
+                    } catch (RuntimeException ex) {
+                        nms.releaseDimension(dimension);
+                        future.completeExceptionally(ex);
+                    }
+                });
+            } catch (Throwable ex) {
+                nms.releaseDimension(dimension);
+                future.completeExceptionally(ex);
+            }
         });
 
         return future;

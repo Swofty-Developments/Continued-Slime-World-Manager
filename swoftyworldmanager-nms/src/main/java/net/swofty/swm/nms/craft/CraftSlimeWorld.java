@@ -18,8 +18,10 @@ import net.swofty.swm.api.world.SlimeChunk;
 import net.swofty.swm.api.world.SlimeChunkSection;
 import net.swofty.swm.api.world.SlimeWorld;
 import net.swofty.swm.api.world.properties.SlimePropertyMap;
+import net.swofty.swm.nms.custom.CustomWorldServer;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Player;
 
 import java.io.ByteArrayOutputStream;
@@ -61,19 +63,23 @@ public class CraftSlimeWorld implements SlimeWorld {
     public void unloadWorld(boolean save, String fallBack) {
         World world = Bukkit.getWorld(name);
 
-        // Teleport all players outside the world before unloading it
+        if (world == null) {
+            throw new IllegalStateException("World " + name + " is not loaded.");
+        }
+
+        CustomWorldServer handle = (CustomWorldServer) ((CraftWorld) world).getHandle();
         List<Player> players = world.getPlayers();
 
         if (!players.isEmpty()) {
-            World fallbackWorld = null;
-            if (fallBack != null) {
-                fallbackWorld = Bukkit.getWorld(fallBack);
-            } else {
-                fallbackWorld = Bukkit.getWorlds().get(0);
+            World fallbackWorld = fallBack != null ? Bukkit.getWorld(fallBack) : Bukkit.getWorlds().get(0);
+
+            if (fallbackWorld == null || fallbackWorld.equals(world)) {
+                throw new IllegalStateException("Could not find a fallback world to teleport the players in " + name + " to.");
             }
+
             Location spawnLocation = fallbackWorld.getSpawnLocation();
 
-            while (spawnLocation.getBlock().getType() != Material.AIR || spawnLocation.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
+            while (spawnLocation.getBlockY() < 255 && (spawnLocation.getBlock().getType() != Material.AIR || spawnLocation.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR)) {
                 spawnLocation.add(0, 1, 0);
             }
 
@@ -82,9 +88,16 @@ public class CraftSlimeWorld implements SlimeWorld {
             }
         }
 
+        handle.setUnloading(true);
+
         if (!Bukkit.unloadWorld(world, save)) {
+            handle.setUnloading(false);
             throw new IllegalStateException("Failed to unload world " + name + ".");
-        } else {
+        }
+
+        handle.awaitPendingSave();
+
+        if (!readOnly) {
             try {
                 loader.unlockWorld(name);
             } catch (UnknownWorldException | IOException e) {
@@ -278,7 +291,7 @@ public class CraftSlimeWorld implements SlimeWorld {
 
         for (SlimeChunk chunk : chunks) {
             // Height Maps
-            int[] heightMap = chunk.getHeightMaps().getIntArrayValue("heightMap").get();
+            int[] heightMap = chunk.getHeightMaps().getIntArrayValue("heightMap").orElse(new int[256]);
 
             for (int i = 0; i < 256; i++) {
                 outStream.writeInt(heightMap[i]);

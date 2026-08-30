@@ -8,7 +8,6 @@ import net.swofty.swm.nms.NMSUtil;
 import net.swofty.swm.nms.craft.CraftSlimeWorld;
 import lombok.AccessLevel;
 import lombok.Getter;
-import net.minecraft.server.v1_8_R3.EntityHuman;
 import net.minecraft.server.v1_8_R3.GameRules;
 import net.minecraft.server.v1_8_R3.IChunkLoader;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
@@ -48,7 +47,7 @@ public class CustomDataManager extends WorldNBTStorage {
     //
     // Thanks Spigot!
     public CustomDataManager(SlimeWorld world) {
-        super(new File("temp_" + world.getName()), world.getName(), false);
+        super(new File("temp_" + world.getName()), world.getName(), true);
 
         // The WorldNBTStorage automatically creates some files inside the base dir, so we have to delete them
         // (Thanks again Spigot)
@@ -130,19 +129,5 @@ public class CustomDataManager extends WorldNBTStorage {
     @Override
     public UUID getUUID() {
         return uuid;
-    }
-
-    @Override
-    public void save(EntityHuman entityHuman) {
-
-    }
-
-    @Override
-    public NBTTagCompound load(EntityHuman entityHuman) {
-        return null;
-    }
-
-    @Override public String[] getSeenPlayers() {
-        return new String[0];
     }
 }
