@@ -84,6 +84,17 @@ public class LoaderUtils {
         return loaderMap.get(dataSource);
     }
 
+    public static void closeLoaders() {
+        for (SlimeLoader loader : loaderMap.values()) {
+            try {
+                loader.close();
+            } catch (IOException ex) {
+                Logging.error("Failed to close loader:");
+                ex.printStackTrace();
+            }
+        }
+    }
+
     public static void registerLoader(String dataSource, SlimeLoader loader) {
         if (loaderMap.containsKey(dataSource)) {
             throw new IllegalArgumentException("Data source " + dataSource + " already has a declared loader!");
@@ -112,7 +123,7 @@ public class LoaderUtils {
 
         try {
             byte[] fileHeader = new byte[SlimeFormat.SLIME_HEADER.length];
-            dataStream.read(fileHeader);
+            dataStream.readFully(fileHeader);
 
             if (!Arrays.equals(SlimeFormat.SLIME_HEADER, fileHeader)) {
                 throw new CorruptedWorldException(worldName);
@@ -137,7 +148,7 @@ public class LoaderUtils {
 
             int bitmaskSize = (int) Math.ceil((width * depth) / 8.0D);
             byte[] chunkBitmask = new byte[bitmaskSize];
-            dataStream.read(chunkBitmask);
+            dataStream.readFully(chunkBitmask);
             BitSet chunkBitset = BitSet.valueOf(chunkBitmask);
 
             int compressedChunkDataLength = dataStream.readInt();
@@ -145,7 +156,7 @@ public class LoaderUtils {
             byte[] compressedChunkData = new byte[compressedChunkDataLength];
             byte[] chunkData = new byte[chunkDataLength];
 
-            dataStream.read(compressedChunkData);
+            dataStream.readFully(compressedChunkData);
 
             // Tile Entities
             int compressedTileEntitiesLength = dataStream.readInt();
@@ -153,7 +164,7 @@ public class LoaderUtils {
             byte[] compressedTileEntities = new byte[compressedTileEntitiesLength];
             byte[] tileEntities = new byte[tileEntitiesLength];
 
-            dataStream.read(compressedTileEntities);
+            dataStream.readFully(compressedTileEntities);
 
             // Entities
             byte[] compressedEntities = new byte[0];
@@ -168,7 +179,7 @@ public class LoaderUtils {
                     compressedEntities = new byte[compressedEntitiesLength];
                     entities = new byte[entitiesLength];
 
-                    dataStream.read(compressedEntities);
+                    dataStream.readFully(compressedEntities);
                 }
             }
 
@@ -182,7 +193,7 @@ public class LoaderUtils {
                 compressedExtraTag = new byte[compressedExtraTagLength];
                 extraTag = new byte[extraTagLength];
 
-                dataStream.read(compressedExtraTag);
+                dataStream.readFully(compressedExtraTag);
             }
 
             // World Map NBT tag
@@ -195,7 +206,7 @@ public class LoaderUtils {
                 compressedMapsTag = new byte[compressedMapsTagLength];
                 mapsTag = new byte[mapsTagLength];
 
-                dataStream.read(compressedMapsTag);
+                dataStream.readFully(compressedMapsTag);
             }
 
             if (dataStream.read() != -1) {
@@ -320,7 +331,7 @@ public class LoaderUtils {
                     int[] biomes;
 
                     byte[] byteBiomes = new byte[256];
-                    dataStream.read(byteBiomes);
+                    dataStream.readFully(byteBiomes);
                     biomes = toIntArray(byteBiomes);
 
                     // Chunk Sections
@@ -347,7 +358,7 @@ public class LoaderUtils {
     private static SlimeChunkSection[] readChunkSections(DataInputStream dataStream, int version) throws IOException {
         SlimeChunkSection[] chunkSectionArray = new SlimeChunkSection[16];
         byte[] sectionBitmask = new byte[2];
-        dataStream.read(sectionBitmask);
+        dataStream.readFully(sectionBitmask);
         BitSet sectionBitset = BitSet.valueOf(sectionBitmask);
 
         for (int i = 0; i < 16; i++) {
@@ -357,7 +368,7 @@ public class LoaderUtils {
 
                 if (version < 5 || dataStream.readBoolean()) {
                     byte[] blockLightByteArray = new byte[2048];
-                    dataStream.read(blockLightByteArray);
+                    dataStream.readFully(blockLightByteArray);
                     blockLightArray = new NibbleArray((blockLightByteArray));
                 } else {
                     blockLightArray = null;
@@ -371,11 +382,11 @@ public class LoaderUtils {
                 long[] blockStatesArray;
 
                 blockArray = new byte[4096];
-                dataStream.read(blockArray);
+                dataStream.readFully(blockArray);
 
                 // Block Data Nibble Array
                 byte[] dataByteArray = new byte[2048];
-                dataStream.read(dataByteArray);
+                dataStream.readFully(dataByteArray);
                 dataArray = new NibbleArray((dataByteArray));
 
                 paletteTag = null;
@@ -386,7 +397,7 @@ public class LoaderUtils {
 
                 if (dataStream.readBoolean()) {
                     byte[] skyLightByteArray = new byte[2048];
-                    dataStream.read(skyLightByteArray);
+                    dataStream.readFully(skyLightByteArray);
                     skyLightArray = new NibbleArray((skyLightByteArray));
                 } else {
                     skyLightArray = null;

@@ -84,4 +84,7 @@ public interface SlimeLoader {
      */
     void deleteWorld(String worldName) throws UnknownWorldException, IOException;
 
+    default void close() throws IOException {
+    }
+
 }

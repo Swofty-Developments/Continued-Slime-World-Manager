@@ -287,4 +287,14 @@ public class MongoLoader extends UpdatableLoader {
             throw new IOException(ex);
         }
     }
+
+    @Override
+    public void close() {
+        for (ScheduledFuture future : lockedWorlds.values()) {
+            future.cancel(false);
+        }
+
+        lockedWorlds.clear();
+        client.close();
+    }
 }

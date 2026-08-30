@@ -45,32 +45,40 @@ public class FileLoader implements SlimeLoader {
             throw new UnknownWorldException(worldName);
         }
 
+        if (readOnly) {
+            try (RandomAccessFile file = new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "r")) {
+                return readWorld(file);
+            }
+        }
+
         RandomAccessFile file = worldFiles.computeIfAbsent(worldName, (world) -> {
             try {
                 return new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "rw");
             } catch (FileNotFoundException ex) {
-                return null; // This is never going to happen as we've just checked if the world exists
+                return null;
             }
         });
 
-        if (!readOnly) {
-            FileChannel channel = file.getChannel();
+        FileChannel channel = file.getChannel();
 
-            try {
-                if (channel.tryLock() == null) {
-                    throw new WorldInUseException(worldName);
-                }
-            } catch (OverlappingFileLockException ex) {
+        try {
+            if (channel.tryLock() == null) {
                 throw new WorldInUseException(worldName);
             }
+        } catch (OverlappingFileLockException ex) {
+            throw new WorldInUseException(worldName);
         }
 
+        return readWorld(file);
+    }
+
+    private byte[] readWorld(RandomAccessFile file) throws IOException {
         if (file.length() > Integer.MAX_VALUE) {
             throw new IndexOutOfBoundsException("World is too big!");
         }
 
         byte[] serializedWorld = new byte[(int) file.length()];
-        file.seek(0); // Make sure we're at the start of the file
+        file.seek(0);
         file.readFully(serializedWorld);
 
         return serializedWorld;
@@ -95,28 +103,30 @@ public class FileLoader implements SlimeLoader {
     @Override
     public void saveWorld(String worldName, byte[] serializedWorld, boolean lock) throws IOException {
         RandomAccessFile worldFile = worldFiles.get(worldName);
-        boolean tempFile = worldFile == null;
+        boolean tracked = worldFile != null;
 
-        if (tempFile) {
+        if (!tracked) {
             worldFile = new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "rw");
         }
 
-        worldFile.seek(0); // Make sure we're at the start of the file
-        worldFile.setLength(0); // Delete old data
+        worldFile.seek(0);
+        worldFile.setLength(0);
         worldFile.write(serializedWorld);
 
-        if (lock) {
-            FileChannel channel = worldFile.getChannel();
+        if (!tracked) {
+            if (lock) {
+                FileChannel channel = worldFile.getChannel();
 
-            try {
-                channel.tryLock();
-            } catch (OverlappingFileLockException ignored) {
+                try {
+                    channel.tryLock();
+                } catch (OverlappingFileLockException ignored) {
 
+                }
+
+                worldFiles.put(worldName, worldFile);
+            } else {
+                worldFile.close();
             }
-        }
-
-        if (tempFile) {
-            worldFile.close();
         }
     }
 
@@ -176,5 +186,14 @@ public class FileLoader implements SlimeLoader {
         }
 
         new File(worldDir, worldName + ".swofty").delete();
+    }
+
+    @Override
+    public void close() throws IOException {
+        for (RandomAccessFile file : worldFiles.values()) {
+            file.close();
+        }
+
+        worldFiles.clear();
     }
 }
