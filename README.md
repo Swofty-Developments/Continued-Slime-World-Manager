@@ -1,4 +1,3 @@
-![](https://cdn.discordapp.com/attachments/1122145806066126899/1162312766242160640/image.png?ex=6686639e&is=6685121e&hm=4cb2d8c11923a30fd976746fd60eb6332639befc3ea0b2cbf4d224e5c089470a&)
 # Continued Slime World Manager
 
 [<img src="https://discordapp.com/assets/e4923594e694a21542a489471ecffa50.svg" alt="" height="55" />](https://discord.gg/paper)
