@@ -13,12 +13,12 @@ Releases are auto deployed on push onto the GitHub releases page which can be fo
 
 ## Performance
 
-| World size | Anvil | Slime v4 (4.0.1) | Slime v5 (5.0.0) |
-|---|---|---|---|
-| 625 chunks | 214 ms | 12,703 ms | 49 ms |
-| 1,024 chunks | 249 ms | 22,147 ms | 50 ms |
-| 2,304 chunks | 184 ms | 50,532 ms | 100 ms |
-| 4,096 chunks | 166 ms | 103,251 ms | 150 ms |
+| World size | Anvil (full load) | Grinderwolf SWM v1 (1.1.4) | SWM v3 (3.1.1) | CSWM v5 (5.0.1) |
+|---|---|---|---|---|
+| 625 chunks | 434 ms · 3.8 MB | 29 ms · 2.0 MB | 20 ms · 2.0 MB | 17 ms · 1.3 MB |
+| 1,024 chunks | 402 ms · 7.4 MB | 41 ms · 4.0 MB | 37 ms · 4.0 MB | 33 ms · 2.6 MB |
+| 2,304 chunks | 568 ms · 9.9 MB | 54 ms · 4.5 MB | 55 ms · 4.5 MB | 50 ms · 3.0 MB |
+| 4,096 chunks | 1,153 ms · 19.7 MB | 114 ms · 9.8 MB | 114 ms · 9.6 MB | 104 ms · 6.3 MB |
 
 ## Using CSWM in your plugin
 
