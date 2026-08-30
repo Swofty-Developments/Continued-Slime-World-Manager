@@ -11,6 +11,15 @@ Correct, this is at the core of this continuations design. For versions 1.17 and
 
 Releases are auto deployed on push onto the GitHub releases page which can be found [here](https://github.com/Swofty-Developments/Continued-Slime-World-Manager/releases). Updates are also periodically sent within my discord server located at [discord.gg/paper](discord.gg/paper).
 
+## Performance
+
+| World size | Anvil | Slime v4 (4.0.1) | Slime v5 (5.0.0) |
+|---|---|---|---|
+| 625 chunks | 214 ms | 12,703 ms | 49 ms |
+| 1,024 chunks | 249 ms | 22,147 ms | 50 ms |
+| 2,304 chunks | 184 ms | 50,532 ms | 100 ms |
+| 4,096 chunks | 166 ms | 103,251 ms | 150 ms |
+
 ## Using CSWM in your plugin
 
 #### Maven
