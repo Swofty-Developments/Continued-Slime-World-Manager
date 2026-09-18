@@ -224,6 +224,9 @@ public class SWMPlugin extends JavaPlugin implements SlimePlugin {
                         message = ex.getMessage();
                     } else if (ex instanceof UnknownWorldException) {
                         message = "world does not exist, are you sure you've set the correct data source?";
+                    } else if (ex instanceof UnsupportedWorldVersionException) {
+                        message = "world was saved from Minecraft 1.13 or newer (world version "
+                                + ((UnsupportedWorldVersionException) ex).getWorldVersion() + ") and cannot be loaded on 1.8.8.";
                     } else if (ex instanceof NewerFormatException) {
                         message = "world is serialized in a newer Slime Format version (" + ex.getMessage() + ") that SWM does not understand.";
                     } else if (ex instanceof WorldInUseException) {

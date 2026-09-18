@@ -100,6 +100,9 @@ public class subCommand_clone extends SWMCommand {
 
                 Logging.error("Failed to load world " + templateWorldName + ": world seems to be corrupted.");
                 ex.printStackTrace();
+            } catch (UnsupportedWorldVersionException ex) {
+                sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to load world " + templateWorldName + ": this world" +
+                        " was saved from Minecraft 1.13 or newer (world version " + ex.getWorldVersion() + ") and cannot be loaded on 1.8.8.");
             } catch (NewerFormatException ex) {
                 sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to load world " + templateWorldName + ": this world" +
                         " was serialized with a newer version of the Slime Format (" + ex.getMessage() + ") that SWM cannot understand.");

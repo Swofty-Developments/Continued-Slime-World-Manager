@@ -9,14 +9,23 @@ public class Logging {
     public static final String CONSOLE_PREFIX = ChatColor.LIGHT_PURPLE + "[CSWM] ";
 
     public static void info(String message) {
-        Bukkit.getConsoleSender().sendMessage(CONSOLE_PREFIX + ChatColor.GRAY + message);
+        send(CONSOLE_PREFIX + ChatColor.GRAY + message);
     }
 
     public static void warning(String message) {
-        Bukkit.getConsoleSender().sendMessage(CONSOLE_PREFIX + ChatColor.YELLOW + message);
+        send(CONSOLE_PREFIX + ChatColor.YELLOW + message);
     }
 
     public static void error(String message) {
-        Bukkit.getConsoleSender().sendMessage(CONSOLE_PREFIX + ChatColor.RED + message);
+        send(CONSOLE_PREFIX + ChatColor.RED + message);
+    }
+
+    private static void send(String message) {
+        if (Bukkit.getServer() == null) {
+            System.out.println(ChatColor.stripColor(message));
+            return;
+        }
+
+        Bukkit.getConsoleSender().sendMessage(message);
     }
 }

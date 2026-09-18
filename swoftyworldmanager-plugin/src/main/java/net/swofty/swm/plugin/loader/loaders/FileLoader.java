@@ -3,7 +3,6 @@ package net.swofty.swm.plugin.loader.loaders;
 import net.swofty.swm.api.exceptions.UnknownWorldException;
 import net.swofty.swm.api.exceptions.WorldInUseException;
 import net.swofty.swm.api.loaders.SlimeLoader;
-import net.swofty.swm.plugin.SWMPlugin;
 import net.swofty.swm.plugin.log.Logging;
 
 import java.io.File;
@@ -17,15 +16,20 @@ import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.NotDirectoryException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FileLoader implements SlimeLoader {
 
-    private static final FilenameFilter WORLD_FILE_FILTER = (dir, name) -> name.endsWith(".swofty");
+    private static final String EXTENSION = ".swofty";
+    private static final String LEGACY_EXTENSION = ".slime";
+    private static final FilenameFilter WORLD_FILE_FILTER = (dir, name) -> name.endsWith(EXTENSION) || name.endsWith(LEGACY_EXTENSION);
 
     private final Map<String, RandomAccessFile> worldFiles = new HashMap<>();
+    private final Set<String> legacyWorlds = new HashSet<>();
     private final File worldDir;
 
     public FileLoader(File worldDir) {
@@ -41,23 +45,33 @@ public class FileLoader implements SlimeLoader {
 
     @Override
     public byte[] loadWorld(String worldName, boolean readOnly) throws UnknownWorldException, IOException, WorldInUseException {
-        if (!worldExists(worldName)) {
+        File worldFile = findWorldFile(worldName);
+
+        if (worldFile == null) {
             throw new UnknownWorldException(worldName);
         }
 
         if (readOnly) {
-            try (RandomAccessFile file = new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "r")) {
+            try (RandomAccessFile file = new RandomAccessFile(worldFile, "r")) {
                 return readWorld(file);
             }
         }
 
         RandomAccessFile file = worldFiles.computeIfAbsent(worldName, (world) -> {
             try {
-                return new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "rw");
+                return new RandomAccessFile(worldFile, "rw");
             } catch (FileNotFoundException ex) {
                 return null;
             }
         });
+
+        if (file == null) {
+            throw new UnknownWorldException(worldName);
+        }
+
+        if (isLegacy(worldFile)) {
+            legacyWorlds.add(worldName);
+        }
 
         FileChannel channel = file.getChannel();
 
@@ -84,9 +98,29 @@ public class FileLoader implements SlimeLoader {
         return serializedWorld;
     }
 
+    private File findWorldFile(String worldName) {
+        File worldFile = new File(worldDir, worldName + EXTENSION);
+
+        if (worldFile.exists()) {
+            return worldFile;
+        }
+
+        File legacyFile = new File(worldDir, worldName + LEGACY_EXTENSION);
+
+        return legacyFile.exists() ? legacyFile : null;
+    }
+
+    private static boolean isLegacy(File worldFile) {
+        return worldFile.getName().endsWith(LEGACY_EXTENSION);
+    }
+
+    private static String stripExtension(String fileName) {
+        return fileName.substring(0, fileName.lastIndexOf('.'));
+    }
+
     @Override
     public boolean worldExists(String worldName) {
-        return new File(worldDir, worldName + ".swofty").exists();
+        return findWorldFile(worldName) != null;
     }
 
     @Override
@@ -97,7 +131,7 @@ public class FileLoader implements SlimeLoader {
             throw new NotDirectoryException(worldDir.getPath());
         }
 
-        return Arrays.stream(worlds).map((c) -> c.substring(0, c.length() - 6)).collect(Collectors.toList());
+        return Arrays.stream(worlds).map(FileLoader::stripExtension).distinct().collect(Collectors.toList());
     }
 
     @Override
@@ -105,8 +139,16 @@ public class FileLoader implements SlimeLoader {
         RandomAccessFile worldFile = worldFiles.get(worldName);
         boolean tracked = worldFile != null;
 
+        if (tracked && legacyWorlds.remove(worldName)) {
+            // The world was loaded from a legacy file, which is left untouched. Move the lock over to the new file.
+            worldFile.close();
+            worldFile = new RandomAccessFile(new File(worldDir, worldName + EXTENSION), "rw");
+            tryLock(worldFile);
+            worldFiles.put(worldName, worldFile);
+        }
+
         if (!tracked) {
-            worldFile = new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "rw");
+            worldFile = new RandomAccessFile(new File(worldDir, worldName + EXTENSION), "rw");
         }
 
         worldFile.seek(0);
@@ -115,18 +157,19 @@ public class FileLoader implements SlimeLoader {
 
         if (!tracked) {
             if (lock) {
-                FileChannel channel = worldFile.getChannel();
-
-                try {
-                    channel.tryLock();
-                } catch (OverlappingFileLockException ignored) {
-
-                }
-
+                tryLock(worldFile);
                 worldFiles.put(worldName, worldFile);
             } else {
                 worldFile.close();
             }
+        }
+    }
+
+    private static void tryLock(RandomAccessFile worldFile) throws IOException {
+        try {
+            worldFile.getChannel().tryLock();
+        } catch (OverlappingFileLockException ignored) {
+
         }
     }
 
@@ -137,6 +180,7 @@ public class FileLoader implements SlimeLoader {
         }
 
         RandomAccessFile file = worldFiles.remove(worldName);
+        legacyWorlds.remove(worldName);
 
         if (file != null) {
             file.close();
@@ -144,12 +188,18 @@ public class FileLoader implements SlimeLoader {
     }
 
     @Override
-    public boolean isWorldLocked(String worldName) throws IOException {
+    public boolean isWorldLocked(String worldName) throws UnknownWorldException, IOException {
         RandomAccessFile file = worldFiles.get(worldName);
         boolean closeOnFinish = false;
 
         if (file == null) {
-            file = new RandomAccessFile(new File(worldDir, worldName + ".swofty"), "rw");
+            File worldFile = findWorldFile(worldName);
+
+            if (worldFile == null) {
+                throw new UnknownWorldException(worldName);
+            }
+
+            file = new RandomAccessFile(worldFile, "rw");
             closeOnFinish = true;
         }
 
@@ -185,7 +235,8 @@ public class FileLoader implements SlimeLoader {
             throw new UnknownWorldException(worldName);
         }
 
-        new File(worldDir, worldName + ".swofty").delete();
+        new File(worldDir, worldName + EXTENSION).delete();
+        new File(worldDir, worldName + LEGACY_EXTENSION).delete();
     }
 
     @Override
@@ -195,5 +246,6 @@ public class FileLoader implements SlimeLoader {
         }
 
         worldFiles.clear();
+        legacyWorlds.clear();
     }
 }
