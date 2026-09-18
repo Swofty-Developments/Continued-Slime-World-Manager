@@ -5,6 +5,10 @@
 
 Currently, SWM can run on any Spigot version from 1.8.8
 
+* Can I load worlds from Grinderwolf's Slime World Manager?
+
+Yes. Drop the `.slime` file into the `slime_worlds` folder (or the MySQL/MongoDB table) and load it as usual. CSWM reads Slime Format v1 to v9 and rewrites the world as a `.swofty` file in the current format on its next save, leaving the `.slime` file untouched. Worlds saved from Minecraft 1.13 or newer cannot be loaded on 1.8.8.
+
 * Can I override the default world?
 
 Yes, you can! However, that requires doing some extra steps. Take a look at the [Installing Slime World Manager](usage/install.md) page.

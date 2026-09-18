@@ -1,8 +1,7 @@
 -------------------------------------
 “Slime” file format
 2 bytes - magic = 0xB10B
-// removed from Continued-Swofty-Manager: 1 byte (ubyte) - version, 1.8.8 = 0x01
-// removed from Continued-Swofty-Manager: 1 byte (ubyte) - world version (see version list below)
+1 byte (ubyte) - format version, current = 0x0A
 2 bytes (short) - xPos of chunk lowest x & lowest z
 2 bytes (short) - zPos
 2 bytes (ushort) - width
@@ -59,3 +58,24 @@ Custom chunk format
   [if has sky light]
     2048 bytes - sky light
   For each section
+
+-------------------------------------
+Legacy formats
+
+CSWM reads format versions 1 to 9, as written by Grinderwolf's Slime World
+Manager 1.x and 2.x, and rewrites the world in the current format on its next
+save. Files using the ".slime" extension are picked up by the file data source.
+Differences from the current format:
+
+  v4-v5: 1 byte (boolean) after the format version, true for 1.13+ worlds
+  v6-v9: 1 byte (ubyte) after the format version, the world version
+         (1 = 1.8, 2 = 1.9, 3 = 1.11, 4 and up = 1.13 and newer)
+  v1-v4: block light and sky light are always present, no boolean before either
+  v1-v3: 2 bytes (short) HypixelBlocks3 length, then that many bytes, after each section
+  v1:    no "extra" section
+  v1-v2: no entities section
+  v1-v6: no world maps section
+  v8:    4 bytes (int) unused biome array length before the biomes of each chunk
+
+Worlds with world version 4 or higher use the 1.13+ palette chunk format and
+are rejected.
