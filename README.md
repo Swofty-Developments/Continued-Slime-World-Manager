@@ -7,6 +7,9 @@ Continued Slime World Manager is a 1.8.x variant of Slime World Manager which is
 #### This only supports 1.8?
 Correct, this is at the core of this continuations design. For versions 1.17 and above we highly recommend [Paul19988's Advanced Slime World Manager](https://github.com/Paul19988/Advanced-Slime-World-Manager), which is maintained by in large by Paul, a newly hired Hypixel administrator as of mid 2023.
 
+#### Can I load worlds from Grinderwolf's Slime World Manager?
+Yes. CSWM loads `.slime` files written by Slime World Manager 1.x and 2.x (Slime Format v1 to v9) and rewrites them as `.swofty` files in the current format on their next save. The original `.slime` file is left untouched. Worlds saved from Minecraft 1.13 or newer cannot be loaded on 1.8.8.
+
 #### Releases
 
 Releases are auto deployed on push onto the GitHub releases page which can be found [here](https://github.com/Swofty-Developments/Continued-Slime-World-Manager/releases). Updates are also periodically sent within my discord server located at [discord.gg/paper](discord.gg/paper).
