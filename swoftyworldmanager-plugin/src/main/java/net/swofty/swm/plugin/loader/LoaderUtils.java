@@ -10,6 +10,7 @@ import com.flowpowered.nbt.stream.NBTInputStream;
 import com.github.luben.zstd.Zstd;
 import net.swofty.swm.api.exceptions.CorruptedWorldException;
 import net.swofty.swm.api.exceptions.NewerFormatException;
+import net.swofty.swm.api.exceptions.UnsupportedWorldVersionException;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.utils.NibbleArray;
 import net.swofty.swm.api.utils.SlimeFormat;
@@ -41,6 +42,9 @@ public class LoaderUtils {
 
     public static final long MAX_LOCK_TIME = 300000L; // Max time difference between current time millis and world lock
     public static final long LOCK_INTERVAL = 60000L;
+
+    private static final byte WORLD_VERSION_1_8 = 1;
+    private static final byte WORLD_VERSION_1_13 = 4;
 
     private static Map<String, SlimeLoader> loaderMap = new HashMap<>();
 
@@ -134,6 +138,23 @@ public class LoaderUtils {
 
             if (version > SlimeFormat.SLIME_VERSION) {
                 throw new NewerFormatException(version);
+            }
+
+            // World version, only stored by legacy formats
+            byte worldVersion = readWorldVersion(dataStream, version);
+
+            if (worldVersion >= WORLD_VERSION_1_13) {
+                throw new UnsupportedWorldVersionException(worldName, worldVersion);
+            }
+
+            if (version < SlimeFormat.SLIME_VERSION) {
+                Logging.info("World " + worldName + " is stored in legacy Slime Format v" + version
+                        + " and will be rewritten in v" + SlimeFormat.SLIME_VERSION + " on its next save.");
+            }
+
+            if (worldVersion > WORLD_VERSION_1_8) {
+                Logging.warning("World " + worldName + " was saved from Minecraft 1.9-1.12 (world version " + worldVersion
+                        + "). Blocks unknown to 1.8.8 will load as air.");
             }
 
             // Chunk
@@ -288,7 +309,10 @@ public class LoaderUtils {
 
             if (propertiesTag.isPresent()) {
                 worldPropertyMap = SlimePropertyMap.fromCompound(propertiesTag.get());
-                worldPropertyMap.merge(propertyMap); // Override world properties
+
+                if (propertyMap != null) {
+                    worldPropertyMap.merge(propertyMap); // Override world properties
+                }
             } else if (propertyMap == null) { // Make sure the property map is never null
                 worldPropertyMap = new SlimePropertyMap();
             }
@@ -297,6 +321,22 @@ public class LoaderUtils {
         } catch (EOFException ex) {
             throw new CorruptedWorldException(worldName, ex);
         }
+    }
+
+    private static byte readWorldVersion(DataInputStream dataStream, byte version) throws IOException {
+        if (version >= SlimeFormat.SLIME_VERSION) {
+            return WORLD_VERSION_1_8;
+        }
+
+        if (version >= 6) {
+            return dataStream.readByte();
+        }
+
+        if (version >= 4) {
+            return dataStream.readBoolean() ? WORLD_VERSION_1_13 : WORLD_VERSION_1_8;
+        }
+
+        return WORLD_VERSION_1_8;
     }
 
     private static int floor(double num) {
@@ -329,6 +369,11 @@ public class LoaderUtils {
 
                     // Biome array
                     int[] biomes;
+
+                    if (version == 8) {
+                        // v8 wrote a bogus biome array length for pre-1.13 worlds
+                        dataStream.readInt();
+                    }
 
                     byte[] byteBiomes = new byte[256];
                     dataStream.readFully(byteBiomes);
@@ -395,12 +440,17 @@ public class LoaderUtils {
                 // Sky Light Nibble Array
                 NibbleArray skyLightArray;
 
-                if (dataStream.readBoolean()) {
+                if (version < 5 || dataStream.readBoolean()) {
                     byte[] skyLightByteArray = new byte[2048];
                     dataStream.readFully(skyLightByteArray);
                     skyLightArray = new NibbleArray((skyLightByteArray));
                 } else {
                     skyLightArray = null;
+                }
+
+                if (version < 4) {
+                    // HypixelBlocks3 section, dropped in v4
+                    dataStream.skipBytes(dataStream.readShort());
                 }
 
                 chunkSectionArray[i] = new CraftSlimeChunkSection(blockArray, dataArray, paletteTag, blockStatesArray, blockLightArray, skyLightArray);

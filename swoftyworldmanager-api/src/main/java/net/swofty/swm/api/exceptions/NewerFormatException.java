@@ -10,4 +10,8 @@ public class NewerFormatException extends SlimeException {
     public NewerFormatException(byte version) {
         super("v" + version);
     }
+
+    protected NewerFormatException(String message) {
+        super(message);
+    }
 }

@@ -3,6 +3,7 @@ package net.swofty.swm.plugin.commands.subtypes;
 import net.swofty.swm.api.exceptions.CorruptedWorldException;
 import net.swofty.swm.api.exceptions.NewerFormatException;
 import net.swofty.swm.api.exceptions.UnknownWorldException;
+import net.swofty.swm.api.exceptions.UnsupportedWorldVersionException;
 import net.swofty.swm.api.exceptions.WorldInUseException;
 import net.swofty.swm.api.loaders.SlimeLoader;
 import net.swofty.swm.api.world.SlimeWorld;
@@ -101,6 +102,9 @@ public class subCommand_loadtemplate extends SWMCommand implements CommandCooldo
 
                 Logging.error("Failed to load world " + templateWorldName + ": world seems to be corrupted.");
                 ex.printStackTrace();
+            } catch (UnsupportedWorldVersionException ex) {
+                sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to load world " + templateWorldName + ": this world" +
+                        " was saved from Minecraft 1.13 or newer (world version " + ex.getWorldVersion() + ") and cannot be loaded on 1.8.8.");
             } catch (NewerFormatException ex) {
                 sender.send(Logging.COMMAND_PREFIX + ChatColor.RED + "Failed to load world " + templateWorldName + ": this world" +
                         " was serialized with a newer version of the Slime Format (" + ex.getMessage() + ") that SWM cannot understand.");
